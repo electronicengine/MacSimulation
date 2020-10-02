@@ -40,9 +40,8 @@ class Peer
 
 public:
 
-    int Requested_DataRate;
+    double Requested_DataRate;
     int Current_DataRate;
-    int Max_Buffer;
     int Available_Buffer;
     int Current_Buffer;
     int Dropped_Packages;
@@ -59,6 +58,7 @@ public:
 
     bool Data_Sent;
     bool Enabled_BufferOverflow;
+    bool Random_Slot_Selected;
 
     Peer(int id, const InputInfo &Input);
     ~Peer();

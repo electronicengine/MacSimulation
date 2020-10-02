@@ -26,13 +26,13 @@ Peer::Peer(int Id, const InputInfo &Input) :
     Collusion = 0;
     Dropped_Packages = 0;
     Delay_Counter = 1;
+    Random_Slot_Selected = false;
 
     Data_Sent = true;
 
     Peer_Id = Id;
     Max_Rety_Count = Input.Peer_List[Id].Rety_Count;
     Requested_DataRate = Input.Peer_List[Id].Data_Rate;
-    Max_Buffer = Input.Peer_List[Id].Peer_Buffer;
     Available_Buffer = Input.Peer_List[Id].Peer_Buffer;
     Enabled_BufferOverflow = Input.Enable_Buffer_Overflow;
     Slot_Lenght = Input.Slot_Lenght;
@@ -69,7 +69,6 @@ PeerOutput *Peer::beacon(const TimeSlots &Slots)
     SuperFrame_Slot_Number = 1;
     Slot_Counter++;
 
-    Peer_Output.Collusion_ = Collusion;
 
     return &Peer_Output;
 }
@@ -85,9 +84,12 @@ int Peer::cap(int SlotNumber)
     SuperFrame_Slot_Number++;
     Slot_Counter++;
 
-    if(Random_CapSlot == 0 && Reservation_Succesfull != true && Queued_Packets > 1)
+    if(Random_CapSlot == 0 && Reservation_Succesfull != true && Queued_Packets > 1 &&
+            Random_Slot_Selected == true)
     {
         std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Aloha Send " << std::endl;
+
+        Random_Slot_Selected = false;
 
         Cap_Request++;
         if(Random_CapSlot != 0)
@@ -132,6 +134,12 @@ int Peer::cfp(int SlotNumber)
 
             std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Sending Package Number: " <<
                          Total_Package_Sent << std::endl;
+
+            if(SlotNumber == (Cfp_Slot_Lenght + Cfp_Slot_Start - 1)) // in the last cfp slot
+            {
+                Cfp_Slot_Lenght = 0;
+                Cfp_Slot_Start = 0;
+            }
         }
     }
 
@@ -159,6 +167,7 @@ void Peer::callBackCapResponse(bool CollutionOccured, int CfpSlotStart, int Slot
     else
     {
         Collusion++;
+        Peer_Output.Collusion_ = Collusion;
 
         Reservation_Succesfull = false;
         Rety_Count++;
@@ -216,8 +225,11 @@ void Peer::reset()
 void Peer::getRandomSlot()
 {
 
-    if(Random_CapSlot == 0)
+    if(Random_CapSlot == 0 && Random_Slot_Selected == false && std::floor(Queued_Packets) >= 1)
     {
+
+        Random_Slot_Selected = true;
+
         if(Contantion_Window == 0)
             Contantion_Window = Time_Slots->Cap_Slot_Number;
 
@@ -235,9 +247,11 @@ void Peer::generatePackage()
 
 
     double per_slot_bit = (double) Requested_DataRate * Slot_Lenght;
-    std::cout << "per_slot_bit: " << std::to_string(per_slot_bit) << std::endl;
+    std::cout << "Peer Id " << std::to_string(Peer_Id)
+              << "per_slot_bit: " << std::to_string(per_slot_bit) << std::endl;
     double per_slot_pack = (double) per_slot_bit / (PACKAGE_SIZE * 8);
-    std::cout << "per_slot_pack: " << std::to_string(per_slot_pack) << std::endl;
+    std::cout << "Peer Id " << std::to_string(Peer_Id)
+              << "per_slot_pack: " << std::to_string(per_slot_pack) << std::endl;
 
 
     Queued_Packets += per_slot_pack * (SuperFrame_Slot_Number);

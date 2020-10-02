@@ -58,6 +58,7 @@ private slots:
     void simulationAddButtonClicked();
     void clearListButtonClicked();
     void clearArrayButtonClicked();
+    void progressBarUpdate();
 
     void simulationArrayListDoubleClicked(QListWidgetItem *item);
 signals:
@@ -77,7 +78,7 @@ private:
     QAction *Edit_Action;
     QAction *Auto_Add_User;
 
-
+    QTimer *Progress_Timer;
     std::mutex Operator_Mutex;
     std::queue<std::shared_ptr<Simulation>> Simulation_Queue;
     std::vector<std::shared_ptr<Simulation>> Simulation_List;
@@ -92,7 +93,8 @@ private:
     int Current_Simulation_Array;
     int Next_Ticket_Number;
     int Thread_Size;
-
+    int Current_Simulation_Progress;
+    int Progress_Duration;
     void loadCurrentSimulationList(int Index);
     void lockButtons();
     void unlockButtons();

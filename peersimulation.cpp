@@ -72,31 +72,31 @@ void PeerSimulation::saveGraphInfo(const QString &Dir)
 {
 
 
-//    QFile file(Dir + "/" + Title_ + ".log");
-//    file.open(QIODevice::WriteOnly | QIODevice::Text);
+    QFile file(Dir + "/" + Title_ + ".log");
+    file.open(QIODevice::WriteOnly | QIODevice::Text);
 
-//    QTextStream out(&file);
+    QTextStream out(&file);
 
 
-//    out << "\t\t Collusion: "
-//        << "\t\t Buffer: "
-//        << "\t\t DataRate: "
-//        << "\t\t Delay: "
-//        << "\t\t Drop: "
-//        << "\t\t Unsuccess Reservation: "
-//        <<" \n\n";
+    out << "\t\t Collusion: "
+        << "\t\t Buffer: "
+        << "\t\t DataRate: "
+        << "\t\t Delay: "
+        << "\t\t Drop: "
+        << "\t\t Unsuccess Reservation: "
+        <<" \n\n";
 
-//    for(int i = 0; i<Sample_Count; i++)
-//    {
-//        out << i
-//            << "\t\t " << QString::number(Collution_Values[i].y()).leftJustified(8,'0')
-//            << "\t\t " << QString::number(Buffer_Values[i].y()).rightJustified(8,'0')
-//            << "\t\t " << QString::number(DataRate_Values[i].y()).leftJustified(8,'0')
-//            << "\t\t " << QString::number(Delay_Values[i].y()).rightJustified(8,'0')
-//            << "\t\t " << QString::number(Dropped_Pack_Values[i].y()).rightJustified(8,'0')
-//            << "\t\t " << QString::number(Reservation_Values[i].y()).rightJustified(8,'0')
-//            <<" \n";
-//    }
+    for(int i = 0; i<Sample_Count; i++)
+    {
+        out << i
+            << "\t\t " << QString::number(Collution_Values[i].y()).leftJustified(8,'0')
+            << "\t\t " << QString::number(Buffer_Values[i].y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(DataRate_Values[i].y()).leftJustified(8,'0')
+            << "\t\t " << QString::number(Delay_Values[i].y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Dropped_Pack_Values[i].y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Reservation_Values[i].y()).rightJustified(8,'0')
+            <<" \n";
+    }
 
     Collution_Values.clear();
     Collution_Values.squeeze();
@@ -116,17 +116,9 @@ void PeerSimulation::saveGraphInfo(const QString &Dir)
     Reservation_Values.clear();
     Reservation_Values.squeeze();
 
-    Sample_Count = 0;
+//    Sample_Count = 0;
 
-    Avarage_Delay_Value = 0;
-    Max_Peer_Collusion_Value = 0;
-    Max_Total_Collusion_Value = 0;
-    Max_Buffer_Value = 0;
-    Max_DataRate_Value = 0;
-    Max_Dropped_Backage = 0;
-    Total_Slot = 0;
-    Max_Delay_Value = 0;
-    Max_Unsuc_Reservation_Value = 0;
+
     (void)Dir;
 
 }
@@ -153,19 +145,19 @@ const PeerSimulationOutput &PeerSimulation::getPeerSimulationOutput()
 void PeerSimulation::addCollusionValue(double Value)
 {
 
-//    if(Value > Max_Total_Collusion_Value)
-//    {
-//        Max_Total_Collusion_Value = Value;
-//    }
+    if(Value > Max_Total_Collusion_Value)
+    {
+        Max_Total_Collusion_Value = Value;
+    }
 
-//    Collution_Values.append(QPointF(Sample_Count, Value));
+    Collution_Values.append(QPointF(Sample_Count, Value));
 
 
-    Max_Total_Collusion_Value = Max_Total_Collusion_Value * (Sample_Count);
+//    Max_Total_Collusion_Value = Max_Total_Collusion_Value * (Sample_Count);
 
-    Max_Total_Collusion_Value += Value;
+//    Max_Total_Collusion_Value += Value;
 
-    Max_Total_Collusion_Value /= (Sample_Count + 1);
+//    Max_Total_Collusion_Value /= (Sample_Count + 1);
 
 }
 
@@ -182,7 +174,7 @@ void PeerSimulation::addDataRateValue(double Value)
 
 //    }
 
-//    DataRate_Values.append(QPointF(Sample_Count, Value));
+    DataRate_Values.append(QPointF(Sample_Count, Value));
 
     Max_DataRate_Value = Max_DataRate_Value * (Sample_Count);
 
@@ -204,7 +196,7 @@ void PeerSimulation::addDelayValue(int Value)
 
     }
 
-//    Delay_Values.append(QPointF(Sample_Count, Value));
+    Delay_Values.append(QPointF(Sample_Count, Value));
 
     Avarage_Delay_Value = Avarage_Delay_Value * (Sample_Count);
 
@@ -228,12 +220,12 @@ void PeerSimulation::addBufferValue(int Value)
 
 //    }
 
-//    Buffer_Values.append(QPointF(Sample_Count, Value));
+    Buffer_Values.append(QPointF(Sample_Count, Value));
 
 
     Max_Buffer_Value = Max_Buffer_Value * (Sample_Count);
 
-    Max_Buffer_Value += Value;
+    Max_Buffer_Value += (double)Value;
 
     Max_Buffer_Value /= (Sample_Count + 1);
 }
@@ -248,7 +240,7 @@ void PeerSimulation::addDroppedPackValue(int Value)
 
     }
 
-//    Dropped_Pack_Values.append(QPointF(Sample_Count, Value));
+    Dropped_Pack_Values.append(QPointF(Sample_Count, Value));
 
 //    Max_Dropped_Backage = Max_Dropped_Backage * (Sample_Count);
 
@@ -267,7 +259,7 @@ void PeerSimulation::addReservationValue(int Value)
 
     }
 
-//    Reservation_Values.append(QPointF(Sample_Count, Value));
+    Reservation_Values.append(QPointF(Sample_Count, Value));
 
 //    Max_Unsuc_Reservation_Value = Max_Unsuc_Reservation_Value * (Sample_Count);
 

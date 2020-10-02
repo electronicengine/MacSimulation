@@ -50,7 +50,7 @@ private:
 
     int id;
     int Max_Unsuc_Reservation_Value;
-    int Max_Buffer_Value;
+    double Max_Buffer_Value;
     double Max_Dropped_Backage;
     double Max_DataRate_Value;
     double Max_Total_Collusion_Value;

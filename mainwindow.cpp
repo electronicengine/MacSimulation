@@ -11,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     MainWindow_Ui->setupUi(this);
 
+    Progress_Timer = new QTimer(this);
+
     Edit_Action = new QAction("Edit Simulation Inputs", this);
     Auto_Add_Cap = new QAction("AutoAdd Increasing Cap", this);
     Auto_Add_Cfp = new QAction("AutoAdd Increasing Cfp", this);
@@ -21,9 +23,11 @@ MainWindow::MainWindow(QWidget *parent)
     Menu_.addAction(Auto_Add_Cfp);
     Menu_.addAction(Auto_Add_User);
 
+
     Menu_.setStyleSheet("background-color: rgb(46, 52, 54); \
                         color: rgb(114, 159, 207);");
 
+    connect(Progress_Timer, SIGNAL(timeout()), this, SLOT(progressBarUpdate()));
     connect(Edit_Action, SIGNAL(triggered(bool)), this, SLOT(editActionTriggered(bool)));
     connect(Auto_Add_Cap, SIGNAL(triggered(bool)), this, SLOT(autoAddIncreasingCapTriggered(bool)));
     connect(Auto_Add_Cfp, SIGNAL(triggered(bool)), this, SLOT(autoAddIncreasingCfpTriggered(bool)));
@@ -44,7 +48,11 @@ MainWindow::MainWindow(QWidget *parent)
     Current_Simulation_Array = 0;
     Next_Ticket_Number = 0;
     Thread_Size = 0;
+    Current_Simulation_Progress = 0;
+    Progress_Duration = 0;
+
     //std::cout << "MainWindow::"<<  std::endl;
+    MainWindow_Ui->simulation_progress->setValue(0);
 
 
 }
@@ -281,6 +289,17 @@ void MainWindow::clearArrayButtonClicked()
 }
 
 
+
+void MainWindow::progressBarUpdate()
+{
+    Current_Simulation_Progress++;
+
+    double progress = ((double)(Current_Simulation_Progress) / ((double)Progress_Duration / 1000)) * 100;
+
+    MainWindow_Ui->simulation_progress->setValue(progress);
+}
+
+
 void MainWindow::simulationAddButtonClicked()
 {
 
@@ -398,6 +417,9 @@ void MainWindow::sortSimulations(Simulation *Sim)
     {
         Next_Ticket_Number = 0;
 
+        MainWindow_Ui->simulation_progress->setValue(0);
+        Current_Simulation_Progress = 0;
+
         for(int i=0; i < Thread_Size; i++)
         {
             processCurrentSimulationOutput(Sorted_Simulations[i]);
@@ -480,6 +502,11 @@ void MainWindow::unlockButtons()
 
     Edit_Action->setEnabled(true);
     Auto_Add_Cfp->setEnabled(true);
+
+    Progress_Timer->stop();
+    MainWindow_Ui->simulation_progress->setValue(0);
+    Current_Simulation_Progress = 0;
+    Progress_Duration = 0;
 }
 
 void MainWindow::createOperators()
@@ -510,6 +537,13 @@ void MainWindow::createOperators()
         ptr->Operator_Id = i;
         Simulation_Operators[i]->start(ptr);
     }
+
+    MainWindow_Ui->simulation_progress->setValue(0);
+    Current_Simulation_Progress = 0;
+
+    if(Simulation_List_Array[0][0] != NULL)
+        Progress_Duration = Simulation_List_Array[0][0]->Input_Info.Simulation_Duration;
+
 }
 
 
@@ -532,6 +566,10 @@ void MainWindow::terminateOperators()
     Simulation_Operators.clear();
     Sorted_Simulations.clear();
 
+    Progress_Timer->stop();
+    MainWindow_Ui->simulation_progress->setValue(0);
+    Current_Simulation_Progress = 0;
+    Progress_Duration = 0;
 }
 
 
@@ -551,6 +589,8 @@ void MainWindow::startButtonToggled(bool checked)
             loadCurrentSimulationList(0);
 
             createOperators();
+            Progress_Timer->start(1000);
+
 
         }
         else
