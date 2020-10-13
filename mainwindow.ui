@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>953</width>
-    <height>553</height>
+    <height>543</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -822,10 +822,10 @@ border-image: url(:/images/delete_pressed.png);
      </rect>
     </property>
     <property name="maximum">
-     <number>30</number>
+     <number>50</number>
     </property>
     <property name="value">
-     <number>2</number>
+     <number>50</number>
     </property>
    </widget>
    <widget class="QLabel" name="label_15">
@@ -871,6 +871,53 @@ border-image: url(:/images/delete_pressed.png);
     </property>
     <property name="alignment">
      <set>Qt::AlignCenter</set>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_17">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>450</y>
+      <width>161</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enable Simulation Log</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="enable_simulation_log_button">
+    <property name="geometry">
+     <rect>
+      <x>190</x>
+      <y>470</y>
+      <width>71</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#enable_simulation_log_button:checked
+{
+border-image: url(:/images/toggle_button_on.png);
+}
+#enable_simulation_log_button
+{
+border-image: url(:/images/toggle_button_off.png);
+}
+
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeat">
+     <bool>false</bool>
     </property>
    </widget>
   </widget>

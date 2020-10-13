@@ -9,13 +9,14 @@
 struct PeerSimulationOutput
 {
 
-    int Max_Unsuccesfull_Reservation;
-    int Max_Buffer_Value;
-    int Max_Dropped_Package_Value;
-    int Max_Delay;
+    double Max_Unsuccesfull_Reservation;
+    double Max_Buffer_Value;
+    double Max_Dropped_Package_Value;
+    double Max_Delay;
     double Avarage_Delay_Value;
     double Max_DataRate_Value;
     double Max_Total_Collusion_Value;
+    double Max_Total_Sent_Package;
 
     void reset()
     {
@@ -26,6 +27,7 @@ struct PeerSimulationOutput
         Avarage_Delay_Value = 0;
         Max_DataRate_Value = 0;
         Max_Total_Collusion_Value = 0;
+        Max_Total_Sent_Package = 0;
     }
 
 };
@@ -49,7 +51,10 @@ private:
 
 
     int id;
-    int Max_Unsuc_Reservation_Value;
+
+    bool Save_Log;
+    double Max_Unsuc_Reservation_Value;
+    double Max_Total_Sent_Package;
     double Max_Buffer_Value;
     double Max_Dropped_Backage;
     double Max_DataRate_Value;
@@ -76,12 +81,13 @@ private:
 
     void addCollusionValue(double Value);
     void addDataRateValue(double Value);
-    void addAvarageDelayValue(int Value);
-    void addDelayValue(int Value);
+    void addAvarageDelayValue(double Value);
+    void addDelayValue(double Value);
 
-    void addBufferValue(int Value);
-    void addDroppedPackValue(int Value);
-    void addReservationValue(int Value);
+    void addBufferValue(double Value);
+    void addDroppedPackValue(double Value);
+    void addReservationValue(double Value);
+    void addTotalSentPackage(double Value);
 };
 
 #endif // PEERSIMULATION_H

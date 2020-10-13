@@ -17,8 +17,10 @@ SimulationResultWindow::SimulationResultWindow(const QString &Title, QWidget *pa
     Max_Total_Collusion_Value = 0;
     Max_Buffer_Value = 0;
     Max_DataRate_Value = 0;
-    Max_Dropped_Backage = 0;
+    Max_Dropped_Package = 0;
     Max_Unsuc_Reservation_Value = 0;
+    Avarage_Collution_Value = 0;
+
 
     setupBufferGraph();
     setupCollusionGraph();
@@ -28,6 +30,8 @@ SimulationResultWindow::SimulationResultWindow(const QString &Title, QWidget *pa
     setupReservationGraph();
 
     Avarage_Delay_Series = std::make_unique<QLineSeries>();
+    Total_Package_Sent_Series = std::make_unique<QLineSeries>();
+
 
     this->setFormTitle(Title);
 
@@ -48,12 +52,14 @@ PeerSimulationOutput SimulationResultWindow::getOutput()
 
     PeerSimulationOutput output;
 
-    output.Max_Buffer_Value = ui->buffer_max->text().toInt();
+    output.Max_Buffer_Value = ui->buffer_max->text().toDouble();
     output.Max_DataRate_Value = ui->datarate_max->text().toDouble();
     output.Max_Total_Collusion_Value = ui->collusion_total_max->text().toDouble();
+//    output.Max_Total_Collusion_Value = Avarage_Collution_Value;
     output.Max_Delay = ui->delay_max->text().toDouble();
-    output.Max_Dropped_Package_Value = ui->dropped_package_max->text().toDouble();
-    output.Max_Unsuccesfull_Reservation = ui->reservation_max->text().toInt();
+    output.Max_Dropped_Package_Value = Max_Dropped_Package;
+    output.Max_Total_Sent_Package = Total_Package_Sent_Value;
+    output.Max_Unsuccesfull_Reservation = ui->reservation_max->text().toDouble();
 
     output.Avarage_Delay_Value = Max_Avarage_Delay_Value;
 
@@ -279,6 +285,12 @@ void SimulationResultWindow::addCollusionValue(double Value)
 
     Collusion_Series->append(Sample_Count, Value);
 
+//    Avarage_Collution_Value = Avarage_Collution_Value * (Sample_Count - 1);
+
+//    Avarage_Collution_Value += Value;
+
+//    Avarage_Collution_Value /= (Sample_Count);
+
 }
 
 
@@ -303,7 +315,7 @@ void SimulationResultWindow::addDataRateValue(double Value)
 
 
 
-void SimulationResultWindow::addDelayValue(int Value)
+void SimulationResultWindow::addDelayValue(double Value)
 {
 
 
@@ -322,7 +334,7 @@ void SimulationResultWindow::addDelayValue(int Value)
 
 
 
-void SimulationResultWindow::addAvarageDelayValue(int Value)
+void SimulationResultWindow::addAvarageDelayValue(double Value)
 {
     if(Value > Max_Avarage_Delay_Value)
     {
@@ -334,7 +346,7 @@ void SimulationResultWindow::addAvarageDelayValue(int Value)
 
 
 
-void SimulationResultWindow::addBufferValue(int Value)
+void SimulationResultWindow::addBufferValue(double Value)
 {
 
     if(Value > Max_Buffer_Value)
@@ -351,12 +363,12 @@ void SimulationResultWindow::addBufferValue(int Value)
 
 
 
-void SimulationResultWindow::addDroppedPackValue(int Value)
+void SimulationResultWindow::addDroppedPackValue(double Value)
 {
-    if(Value > Max_Dropped_Backage)
+    if(Value > Max_Dropped_Package)
     {
-        Max_Dropped_Backage = Value;
-        Dropped_Pack_Chart->axes(Qt::Vertical).back()->setRange(0, Max_Dropped_Backage);
+        Max_Dropped_Package = Value;
+        Dropped_Pack_Chart->axes(Qt::Vertical).back()->setRange(0, Max_Dropped_Package);
         ui->dropped_package_max->setText(QString::number(Value));
 
     }
@@ -368,7 +380,20 @@ void SimulationResultWindow::addDroppedPackValue(int Value)
 
 
 
-void SimulationResultWindow::addReservationValue(int Value)
+void SimulationResultWindow::addTotalPackageSentValue(double Value)
+{
+    if(Value > Total_Package_Sent_Value)
+    {
+        Total_Package_Sent_Value = Value;
+    }
+
+    Total_Package_Sent_Series->append(Sample_Count, Value);
+
+}
+
+
+
+void SimulationResultWindow::addReservationValue(double Value)
 {
     if(Value > Max_Unsuc_Reservation_Value)
     {
@@ -436,6 +461,7 @@ void SimulationResultWindow::saveGraphtoFile(const QString &UpperDir, const QStr
         << "\t\t Delay: "
         << "\t\t Avarage Delay: "
         << "\t\t Drop: "
+        << "\t\t Package Sent: "
         << "\t\t Unsuccess Reservation: "
         <<" \n\n";
 
@@ -444,24 +470,17 @@ void SimulationResultWindow::saveGraphtoFile(const QString &UpperDir, const QStr
     {
         out << Sample_Names[i]
             << "\t\t " << QString::number(Collusion_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Buffer_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Buffer_Series->at(i).y()).leftJustified(8,'0')
             << "\t\t " << QString::number(DataRate_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Delay_Series->at(i).y()).rightJustified(8,'0')
-            << "\t\t " << QString::number(Avarage_Delay_Series->at(i).y()).rightJustified(8,'0')
-            << "\t\t " << QString::number(Dropped_Pack_Series->at(i).y()).rightJustified(8,'0')
-            << "\t\t " << QString::number(Reservation_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Delay_Series->at(i).y()).leftJustified(8,'0')
+            << "\t\t " << QString::number(Avarage_Delay_Series->at(i).y()).leftJustified(8,'0')
+            << "\t\t " << QString::number(Dropped_Pack_Series->at(i).y()).leftJustified(8,'0')
+            << "\t\t " << QString::number(Total_Package_Sent_Series->at(i).y()).leftJustified(8,'0')
+            << "\t\t " << QString::number(Reservation_Series->at(i).y()).leftJustified(8,'0')
             <<" \n";
     }
 
     Sample_Count = 0;
-
-    Max_Delay_Value = 0;
-    Max_Total_Collusion_Value = 0;
-    Max_Buffer_Value = 0;
-    Max_DataRate_Value = 0;
-    Max_Dropped_Backage = 0;
-    Max_Unsuc_Reservation_Value = 0;
-
 
 }
 
@@ -479,6 +498,7 @@ void SimulationResultWindow::refreshValues(const PeerSimulationOutput &Output, c
     addDelayValue(Output.Max_Delay);
     addAvarageDelayValue(Output.Avarage_Delay_Value);
     addDroppedPackValue(Output.Max_Dropped_Package_Value);
+    addTotalPackageSentValue(Output.Max_Total_Sent_Package);
     addReservationValue(Output.Max_Unsuccesfull_Reservation);
 
 

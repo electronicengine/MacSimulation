@@ -7,7 +7,7 @@
 
 
 Simulation::Simulation(const InputInfo &Info) :
-    Overall_Simulation_Output{0,0,0,0,0,0,0}
+    Overall_Simulation_Output{0,0,0,0,0,0,0,0}
 {
 
     Ping_Counter = 0;
@@ -32,7 +32,7 @@ void Simulation::ping()
 
     Ping_Counter++;
 
-    if(Ping_Counter > Input_Info.Slot_Lenght)
+    if(Ping_Counter >= Input_Info.Slot_Duration)
     {
 
 //        std::cout << "ping - " << Input_Info.Simulation_Name.toStdString() << std::endl;
@@ -151,7 +151,7 @@ const PeerSimulationOutput &Simulation::getSimulationAvarageOutput()
 
             Overall_Simulation_Output.Avarage_Delay_Value += peer_output.Avarage_Delay_Value;
             Overall_Simulation_Output.Max_DataRate_Value += peer_output.Max_DataRate_Value;
-
+            Overall_Simulation_Output.Max_Total_Sent_Package += peer_output.Max_Total_Sent_Package;
             Overall_Simulation_Output.Max_Dropped_Package_Value += peer_output.Max_Dropped_Package_Value;
             Overall_Simulation_Output.Max_Unsuccesfull_Reservation += peer_output.Max_Unsuccesfull_Reservation;
 
@@ -168,6 +168,10 @@ const PeerSimulationOutput &Simulation::getSimulationAvarageOutput()
 
         Overall_Simulation_Output.Avarage_Delay_Value /= Peer_Simulation_Result.size();
         Overall_Simulation_Output.Max_DataRate_Value /= Peer_Simulation_Result.size();
+
+        Overall_Simulation_Output.Max_Total_Sent_Package /= Peer_Simulation_Result.size();
+        Overall_Simulation_Output.Max_Dropped_Package_Value /= Peer_Simulation_Result.size();
+        Overall_Simulation_Output.Max_Unsuccesfull_Reservation /= Peer_Simulation_Result.size();
     }
 
     return Overall_Simulation_Output;

@@ -93,10 +93,13 @@ void MainWindow::setSimulationArrayListName(const QString &Name)
 
 
 
-void MainWindow::simulationEditCallBack(int Index, const InputInfo &Input)
+void MainWindow::simulationEditCallBack(int Index, InputInfo &Input)
 {
     MainWindow_Ui->simulation_list->currentItem()->setText(Input.Simulation_Name +
                                                 QString(" - Duration: ") + QString::number(Input.Simulation_Duration));
+
+    Input.Enable_Simulation_Graph = MainWindow_Ui->enable_simulation_log_button->isChecked();
+
     Simulation_List[Index]->setInputs(Input);
 }
 
@@ -129,12 +132,14 @@ void MainWindow::importListToArray()
 
 
 
-void MainWindow::addSimulation(const InputInfo &Input)
+void MainWindow::addSimulation(InputInfo &Input)
 {
 
     MainWindow_Ui->simulation_list->addItem(Input.Simulation_Name +
                                  QString(" - Duration: ") + QString::number(Input.Simulation_Duration));
 
+
+    Input.Enable_Simulation_Graph = MainWindow_Ui->enable_simulation_log_button->isChecked();
 
     Simulation_List.push_back(std::make_shared<Simulation>(Input));
     Simulation_List[Simulation_List.size() - 1]->setInputs(Input);
@@ -144,12 +149,13 @@ void MainWindow::addSimulation(const InputInfo &Input)
 
 
 
-void MainWindow::simulationAddCallBack(const InputInfo &Input)
+void MainWindow::simulationAddCallBack(InputInfo &Input)
 {
 
     MainWindow_Ui->simulation_list->addItem(Input.Simulation_Name +
                                  QString(" - Duration: ") + QString::number(Input.Simulation_Duration));
 
+    Input.Enable_Simulation_Graph = MainWindow_Ui->enable_simulation_log_button->isChecked();
 
     Simulation_List.push_back(std::make_shared<Simulation>(Input));
     Simulation_List[Simulation_List.size() - 1]->setInputs(Input);
@@ -292,11 +298,12 @@ void MainWindow::clearArrayButtonClicked()
 
 void MainWindow::progressBarUpdate()
 {
-    Current_Simulation_Progress++;
 
     double progress = ((double)(Current_Simulation_Progress) / ((double)Progress_Duration / 1000)) * 100;
 
     MainWindow_Ui->simulation_progress->setValue(progress);
+    Current_Simulation_Progress++;
+
 }
 
 
@@ -351,6 +358,8 @@ void MainWindow::processCurrentSimulationListOutput()
                             Simulation_List_Array_Name[Current_Simulation_Array]);
 
     Current_Simulation = 0;
+
+    MainWindow_Ui->simulation_array_list->item(Current_Simulation_Array)->setBackground(QColor(Qt::GlobalColor::blue));
     Current_Simulation_Array++;
 
     if(Current_Simulation_Array >= (int)Simulation_List_Array.size())
@@ -464,7 +473,6 @@ void MainWindow::loadCurrentSimulationList(int Index)
 
     Simulation_List.clear();
     MainWindow_Ui->simulation_list->clear();
-    MainWindow_Ui->simulation_array_list->item(Index)->setBackground(QColor(Qt::GlobalColor::blue));
 
     for(size_t i = 0; i<Simulation_List_Array[Index].size(); i++)
         Simulation_List.push_back(Simulation_List_Array[Index][i]);
@@ -589,7 +597,7 @@ void MainWindow::startButtonToggled(bool checked)
             loadCurrentSimulationList(0);
 
             createOperators();
-            Progress_Timer->start(1000);
+            Progress_Timer->start(1000 + Thread_Size+4);
 
 
         }

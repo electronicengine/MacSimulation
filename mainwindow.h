@@ -41,10 +41,10 @@ public:
     void showMessageBox(const QString &Tittle, const QString &Content);
     void clearSimulationList();
     void setSimulationArrayListName(const QString &Name);
-    void simulationEditCallBack(int Index, const InputInfo &Input);
+    void simulationEditCallBack(int Index, InputInfo &Input);
     void importListToArray();
-    void addSimulation(const InputInfo &Input);
-    void simulationAddCallBack(const InputInfo &Input);
+    void addSimulation(InputInfo &Input);
+    void simulationAddCallBack(InputInfo &Input);
     void contextMenuEvent(QContextMenuEvent *Event);
 
 private slots:

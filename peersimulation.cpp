@@ -5,7 +5,9 @@
 #include <cmath>
 #include <QTextStream>
 
-PeerSimulation::PeerSimulation(int Id, const InputInfo &Input) : Peer_Simulation_Output{0,0,0,0,0,0,0}
+
+
+PeerSimulation::PeerSimulation(int Id, const InputInfo &Input) : Peer_Simulation_Output{0,0,0,0,0,0,0,0}
 {
 
     Sample_Count = 0;
@@ -19,6 +21,9 @@ PeerSimulation::PeerSimulation(int Id, const InputInfo &Input) : Peer_Simulation
     Total_Slot = 0;
     Max_Delay_Value = 0;
     Max_Unsuc_Reservation_Value = 0;
+    Max_Total_Sent_Package = 0;
+
+    Save_Log = Input.Enable_Simulation_Graph;
 
     Title_ = Input.Simulation_Name;
 
@@ -56,12 +61,16 @@ void PeerSimulation::setInputInfo(int Id, const InputInfo &Input)
 {
     (void)(Id);
     (void)(Input);
-//    ui->user_number->setText(QString::number(Input.Peer_List.size()));
-//    ui->cfp_slotper->setText(QString::number(Input.Cfp_Slot_Per));
-//    ui->cap_slot->setText(QString::number(Input.cap_slot_num));
-//    ui->slot_lenght->setText(QString::number(Input.Slot_Lenght));
-//    ui->supported_datarate->setText(QString::number(Input.Peer_List[Id].Data_Rate));
-//    ui->available_buffer->setText(QString::number(Input.Peer_List[Id].Peer_Buffer));
+
+    if(Save_Log == true)
+    {
+//        ui->user_number->setText(QString::number(Input.Peer_List.size()));
+//        ui->cfp_slotper->setText(QString::number(Input.Cfp_Slot_Per));
+//        ui->cap_slot->setText(QString::number(Input.cap_slot_num));
+//        ui->slot_lenght->setText(QString::number(Input.Slot_Lenght));
+//        ui->supported_datarate->setText(QString::number(Input.Peer_List[Id].Data_Rate));
+//        ui->available_buffer->setText(QString::number(Input.Peer_List[Id].Peer_Buffer));
+    }
 
 
 }
@@ -72,51 +81,54 @@ void PeerSimulation::saveGraphInfo(const QString &Dir)
 {
 
 
-    QFile file(Dir + "/" + Title_ + ".log");
-    file.open(QIODevice::WriteOnly | QIODevice::Text);
-
-    QTextStream out(&file);
-
-
-    out << "\t\t Collusion: "
-        << "\t\t Buffer: "
-        << "\t\t DataRate: "
-        << "\t\t Delay: "
-        << "\t\t Drop: "
-        << "\t\t Unsuccess Reservation: "
-        <<" \n\n";
-
-    for(int i = 0; i<Sample_Count; i++)
+    if(Save_Log == true)
     {
-        out << i
-            << "\t\t " << QString::number(Collution_Values[i].y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Buffer_Values[i].y()).rightJustified(8,'0')
-            << "\t\t " << QString::number(DataRate_Values[i].y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Delay_Values[i].y()).rightJustified(8,'0')
-            << "\t\t " << QString::number(Dropped_Pack_Values[i].y()).rightJustified(8,'0')
-            << "\t\t " << QString::number(Reservation_Values[i].y()).rightJustified(8,'0')
-            <<" \n";
+        QFile file(Dir + "/" + Title_ + ".log");
+        file.open(QIODevice::WriteOnly | QIODevice::Text);
+
+        QTextStream out(&file);
+
+
+        out << "\t\t Collusion: "
+            << "\t\t Buffer: "
+            << "\t\t DataRate: "
+            << "\t\t Delay: "
+            << "\t\t Drop: "
+            << "\t\t Unsuccess Reservation: "
+            <<" \n\n";
+
+        for(int i = 0; i<Sample_Count; i++)
+        {
+            out << i
+                << "\t\t " << QString::number(Collution_Values[i].y()).leftJustified(8,'0')
+                << "\t\t " << QString::number(Buffer_Values[i].y()).rightJustified(8,'0')
+                << "\t\t " << QString::number(DataRate_Values[i].y()).leftJustified(8,'0')
+                << "\t\t " << QString::number(Delay_Values[i].y()).rightJustified(8,'0')
+                << "\t\t " << QString::number(Dropped_Pack_Values[i].y()).rightJustified(8,'0')
+                << "\t\t " << QString::number(Reservation_Values[i].y()).rightJustified(8,'0')
+                <<" \n";
+        }
+
+        Collution_Values.clear();
+        Collution_Values.squeeze();
+
+        Buffer_Values.clear();
+        Buffer_Values.squeeze();
+
+        DataRate_Values.clear();
+        DataRate_Values.squeeze();
+
+        Delay_Values.clear();
+        Delay_Values.squeeze();
+
+        Dropped_Pack_Values.clear();
+        Dropped_Pack_Values.squeeze();
+
+        Reservation_Values.clear();
+        Reservation_Values.squeeze();
+
+        Sample_Count = 0;
     }
-
-    Collution_Values.clear();
-    Collution_Values.squeeze();
-
-    Buffer_Values.clear();
-    Buffer_Values.squeeze();
-
-    DataRate_Values.clear();
-    DataRate_Values.squeeze();
-
-    Delay_Values.clear();
-    Delay_Values.squeeze();
-
-    Dropped_Pack_Values.clear();
-    Dropped_Pack_Values.squeeze();
-
-    Reservation_Values.clear();
-    Reservation_Values.squeeze();
-
-//    Sample_Count = 0;
 
 
     (void)Dir;
@@ -135,6 +147,7 @@ const PeerSimulationOutput &PeerSimulation::getPeerSimulationOutput()
     Peer_Simulation_Output.Avarage_Delay_Value = std::ceil(Avarage_Delay_Value);
     Peer_Simulation_Output.Max_Dropped_Package_Value = Max_Dropped_Backage;
     Peer_Simulation_Output.Max_Unsuccesfull_Reservation = Max_Unsuc_Reservation_Value;
+    Peer_Simulation_Output.Max_Total_Sent_Package = Max_Total_Sent_Package;
 
     return Peer_Simulation_Output;
 }
@@ -145,19 +158,15 @@ const PeerSimulationOutput &PeerSimulation::getPeerSimulationOutput()
 void PeerSimulation::addCollusionValue(double Value)
 {
 
-    if(Value > Max_Total_Collusion_Value)
-    {
-        Max_Total_Collusion_Value = Value;
-    }
 
-    Collution_Values.append(QPointF(Sample_Count, Value));
+    Max_Total_Collusion_Value = Max_Total_Collusion_Value * (Sample_Count);
 
+    Max_Total_Collusion_Value += Value;
 
-//    Max_Total_Collusion_Value = Max_Total_Collusion_Value * (Sample_Count);
+    Max_Total_Collusion_Value /= (Sample_Count + 1);
+    if(Save_Log == true)
+        Collution_Values.append(QPointF(Sample_Count, Value));
 
-//    Max_Total_Collusion_Value += Value;
-
-//    Max_Total_Collusion_Value /= (Sample_Count + 1);
 
 }
 
@@ -166,15 +175,9 @@ void PeerSimulation::addCollusionValue(double Value)
 void PeerSimulation::addDataRateValue(double Value)
 {
 
-//    if(Value > Max_DataRate_Value)
-//    {
 
-//        Max_DataRate_Value = Value;
-
-
-//    }
-
-    DataRate_Values.append(QPointF(Sample_Count, Value));
+    if(Save_Log == true)
+        DataRate_Values.append(QPointF(Sample_Count, Value));
 
     Max_DataRate_Value = Max_DataRate_Value * (Sample_Count);
 
@@ -186,17 +189,11 @@ void PeerSimulation::addDataRateValue(double Value)
 
 
 
-void PeerSimulation::addDelayValue(int Value)
+void PeerSimulation::addDelayValue(double Value)
 {
 
-    if(Value > Max_Delay_Value)
-    {
-
-        Max_Delay_Value = Value;
-
-    }
-
-    Delay_Values.append(QPointF(Sample_Count, Value));
+    if(Save_Log == true)
+        Delay_Values.append(QPointF(Sample_Count, Value));
 
     Avarage_Delay_Value = Avarage_Delay_Value * (Sample_Count);
 
@@ -210,17 +207,11 @@ void PeerSimulation::addDelayValue(int Value)
 
 
 
-void PeerSimulation::addBufferValue(int Value)
+void PeerSimulation::addBufferValue(double Value)
 {
 
-//    if(Value > Max_Buffer_Value)
-//    {
-//        Max_Buffer_Value = Value;
-
-
-//    }
-
-    Buffer_Values.append(QPointF(Sample_Count, Value));
+    if(Save_Log == true)
+        Buffer_Values.append(QPointF(Sample_Count, Value));
 
 
     Max_Buffer_Value = Max_Buffer_Value * (Sample_Count);
@@ -232,40 +223,49 @@ void PeerSimulation::addBufferValue(int Value)
 
 
 
-void PeerSimulation::addDroppedPackValue(int Value)
+void PeerSimulation::addDroppedPackValue(double Value)
 {
-    if(Value > Max_Dropped_Backage)
-    {
-        Max_Dropped_Backage = Value;
 
-    }
+    Max_Dropped_Backage = Max_Dropped_Backage * (Sample_Count);
 
-    Dropped_Pack_Values.append(QPointF(Sample_Count, Value));
+    Max_Dropped_Backage += (double)Value;
 
-//    Max_Dropped_Backage = Max_Dropped_Backage * (Sample_Count);
+    Max_Dropped_Backage /= (Sample_Count + 1);
 
-//    Max_Dropped_Backage += Value;
+    if(Save_Log == true)
+        Dropped_Pack_Values.append(QPointF(Sample_Count, Value));
 
-//    Max_Dropped_Backage /= (Sample_Count + 1);
+
 }
 
 
 
-void PeerSimulation::addReservationValue(int Value)
+void PeerSimulation::addReservationValue(double Value)
 {
-    if(Value > Max_Unsuc_Reservation_Value)
-    {
-        Max_Unsuc_Reservation_Value = Value;
 
-    }
+    Max_Unsuc_Reservation_Value = Max_Unsuc_Reservation_Value * (Sample_Count);
 
-    Reservation_Values.append(QPointF(Sample_Count, Value));
+    Max_Unsuc_Reservation_Value += (double)Value;
 
-//    Max_Unsuc_Reservation_Value = Max_Unsuc_Reservation_Value * (Sample_Count);
+    Max_Unsuc_Reservation_Value /= (Sample_Count + 1);
 
-//    Max_Unsuc_Reservation_Value += Value;
+    if(Save_Log == true)
+        Reservation_Values.append(QPointF(Sample_Count, Value));
 
-//    Max_Unsuc_Reservation_Value /= (Sample_Count + 1);
+}
+
+
+
+void PeerSimulation::addTotalSentPackage(double Value)
+{
+
+    Max_Total_Sent_Package = Max_Total_Sent_Package * (Sample_Count);
+
+    Max_Total_Sent_Package += (double)Value;
+
+    Max_Total_Sent_Package /= (Sample_Count + 1);
+
+
 }
 
 
@@ -281,6 +281,7 @@ void PeerSimulation::refreshValues(PeerOutput *Output, OutputInfo *Total_Output)
     addDelayValue(Output->Delay_);
     addDroppedPackValue(Output->Dropped_Packages);
     addReservationValue(Output->Unsuccessful_Reservation);
+    addTotalSentPackage(Output->Total_Package_Sent);
 
     if(Output->Collusion_ > Max_Peer_Collusion_Value)
     {

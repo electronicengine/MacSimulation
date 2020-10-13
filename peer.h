@@ -16,17 +16,17 @@ struct PeerOutput
 {
     double Collusion_;
     double Data_Rate;
-    int Total_Package;
-    int Delay_;
-    int Buffer_;
-    int Dropped_Packages;
-    int Unsuccessful_Reservation;
+    double Total_Package_Sent;
+    double Dropped_Packages;
+    double Delay_;
+    double Buffer_;
+    double Unsuccessful_Reservation;
 
     void reset()
     {
         Collusion_ = 0;
         Data_Rate = 0;
-        Total_Package = 0;
+        Total_Package_Sent = 0;
         Delay_ = 0;
         Buffer_ = 0;
         Dropped_Packages = 0;
@@ -40,16 +40,21 @@ class Peer
 
 public:
 
-    double Requested_DataRate;
+    double Desired_DataRate;
+    double Supported_DataRate;
+    double PackageTransfer_PerSlot;
     int Current_DataRate;
     int Available_Buffer;
     int Current_Buffer;
-    int Dropped_Packages;
+    double Total_Package_Generated;
+    double Dropped_Packages;
     double Queued_Packets;
-    int Total_Package_Sent;
+    double Total_Package_Sent;
+    double Failed_Reservation;
+    double Reservation_Count;
     int SuperFrame_Slot_Number;
     int Total_Slot_Number;
-    int Slot_Lenght;
+    double Slot_Lenght;
     int Slot_Counter;
     int Cap_Request;
     int Collusion;

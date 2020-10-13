@@ -24,7 +24,8 @@ struct TimeSlots
 
 struct PeerInfo
 {
-    double Data_Rate;
+    double Desired_DataRate;
+    double Supported_DataRate;
     int Peer_Buffer;
     int Rety_Count;
 };
@@ -49,10 +50,12 @@ struct InputInfo
     std::vector<PeerInfo> Peer_List;
     int cap_slot_num;
     int Cfp_Slot_Per;
-    int Slot_Lenght;
+    double Slot_Lenght;
+    int Slot_Duration;
     int Simulation_Duration;
     QString Simulation_Name;
     bool Enable_Buffer_Overflow;
+    bool Enable_Simulation_Graph;
 
 
 };

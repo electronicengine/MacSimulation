@@ -36,14 +36,16 @@ private:
     Ui::SimulationResultWindow *ui;
 
 
-    int Max_Unsuc_Reservation_Value;
-    int Max_Buffer_Value;
-    int Max_Dropped_Backage;
+    double Max_Unsuc_Reservation_Value;
+    double Max_Buffer_Value;
+    double Max_Dropped_Package;
+    double Total_Package_Sent_Value;
     double Max_DataRate_Value;
     double Max_Total_Collusion_Value;
+    double Avarage_Collution_Value;
     double Max_Peer_Collusion_Value;
     double Max_Delay_Value;
-    int Max_Avarage_Delay_Value;
+    double Max_Avarage_Delay_Value;
 
     int Sample_Count;
 
@@ -55,6 +57,8 @@ private:
     std::unique_ptr<QLineSeries> Buffer_Series;
     std::unique_ptr<QLineSeries> Dropped_Pack_Series;
     std::unique_ptr<QLineSeries> Reservation_Series;
+    std::unique_ptr<QLineSeries> Total_Package_Sent_Series;
+
 
     std::unique_ptr<QChartView> Collusion_Chart_View;
     std::unique_ptr<QChartView> DataRate_Chart_View;
@@ -81,11 +85,12 @@ private:
 
     void addCollusionValue(double Value);
     void addDataRateValue(double Value);
-    void addDelayValue(int Value);
-    void addAvarageDelayValue(int Value);
-    void addBufferValue(int Value);
-    void addDroppedPackValue(int Value);
-    void addReservationValue(int Value);
+    void addDelayValue(double Value);
+    void addAvarageDelayValue(double Value);
+    void addBufferValue(double Value);
+    void addDroppedPackValue(double Value);
+    void addTotalPackageSentValue(double Value);
+    void addReservationValue(double Value);
 
 
 };

@@ -21,7 +21,7 @@ public:
     explicit SimulationAddWindow(QWidget *parent = nullptr);
     virtual ~SimulationAddWindow();
 
-    void userAddCallBack(double DataRate, int Buffer, int Rety_Count);
+    void userAddCallBack(PeerInfo Info);
     void editSimulationInputs(int Index, const InputInfo &Inputs);
     void closeEvent(QCloseEvent *Event);
 

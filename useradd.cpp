@@ -31,9 +31,14 @@ UserAdd::~UserAdd()
 
 void UserAdd::acceptedButtonClicked()
 {
+    PeerInfo info;
 
-    Simulation_Add_Window->userAddCallBack(ui->datarate_box->value(), ui->buffer_box->value(),
-                            ui->rety_count->value());
+    info.Desired_DataRate = ui->desired_datarate->value();
+    info.Supported_DataRate = ui->supported_data_rate->value();
+    info.Rety_Count = ui->rety_count->value();
+    info.Peer_Buffer = ui->buffer_box->value();
+
+    Simulation_Add_Window->userAddCallBack(info);
 
 }
 
