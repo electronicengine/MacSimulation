@@ -36,8 +36,8 @@ void SimulationAdder::autoAddSimulationIncreasingCap(const InputInfo &Input)
 
                 double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / input.Peer_List[i].Transmission_Delay;
 
-                double estimated_data_rate = (total_package_per_cfp_slot * PACKAGE_SIZE * 8) * input.Cfp_Slot_Per
-                        /(beacon_period_time + cap_period_time + cfp_period_time);
+                double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Lenght) *
+                                              (PACKAGE_SIZE * 8))/(beacon_period_time + cap_period_time + cfp_period_time);
 
                 double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
                         total_package_per_cfp_slot;
@@ -95,8 +95,8 @@ void SimulationAdder::autoAddSimulationIncreasingCfp(const InputInfo &Input)
 
                 double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / input.Peer_List[i].Transmission_Delay;
 
-                double estimated_data_rate = (total_package_per_cfp_slot * PACKAGE_SIZE * 8) * input.Cfp_Slot_Per
-                        /(beacon_period_time + cap_period_time + cfp_period_time);
+                double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Lenght) *
+                                              (PACKAGE_SIZE * 8))/(beacon_period_time + cap_period_time + cfp_period_time);
 
                 double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
                         total_package_per_cfp_slot;
@@ -154,9 +154,8 @@ void SimulationAdder::autoAddSimulationIncreasingUser(const InputInfo &Input)
 
             double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / transmission_delay;
 
-            double estimated_data_rate = (total_package_per_cfp_slot * PACKAGE_SIZE * 8) * input.Cfp_Slot_Per
-                    / (beacon_period_time + cap_period_time + cfp_period_time);
-
+            double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Lenght) *
+                                          (PACKAGE_SIZE * 8))/(beacon_period_time + cap_period_time + cfp_period_time);
 
             double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
                     total_package_per_cfp_slot;
