@@ -18,6 +18,9 @@ class SimulationAddWindow : public QMainWindow
     Q_OBJECT
 
 public:
+    Ui::SimulationAddWindow *ui;
+
+
     explicit SimulationAddWindow(QWidget *parent = nullptr);
     virtual ~SimulationAddWindow();
 
@@ -33,7 +36,6 @@ private slots:
     void clearListClicked();
 
 private:
-    Ui::SimulationAddWindow *ui;
     MainWindow *Main_Window;
     UserAdd User_Add_Window;
     InputInfo Input_Info;

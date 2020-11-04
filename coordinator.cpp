@@ -1,5 +1,5 @@
 #include "coordinator.h"
-
+#include "logging.h"
 
 
 Coordinator::Coordinator() : Time_Slots{0,0,0,0}
@@ -76,7 +76,6 @@ OutputInfo *Coordinator::ping()
 void Coordinator::beacon()
 {
 
-//    std::cout << "Coordinator BEACON" << std::endl;
 
     Time_Slots.Cfp_Slot_Number = 0;
 
@@ -115,8 +114,9 @@ void Coordinator::cap(int SLotNum)
         Total_Cap_Request += (double)requested_peer.size();
         Total_Collution += (double)requested_peer.size();
 
-//        std::cout << "There is number of " << std::to_string(requested_peer.size() - 1)
-//                  << " collution occured!" << std::endl;
+        Logging::printAll(Logging::white, "There is number of ", std::to_string(requested_peer.size() - 1)
+                                            , " collution occured!" );
+
 
         for(size_t i=0; i<requested_peer.size(); i++)
             requested_peer[i]->callBackCapResponse(true, 0, 0);
@@ -146,7 +146,7 @@ void Coordinator::cap(int SLotNum)
     }
     else
     {
-//        std::cout << "There is no cap request " << std::endl;
+        Logging::printAll(Logging::white, "There is no cap request " );
 
         requested_peer.clear();
 
@@ -186,8 +186,6 @@ void Coordinator::setInputInformation(const InputInfo &Input)
 
     for(int i = 0; i<(int)Input_Info.Peer_List.size(); i++)
     {
-//        std::cout << "Created Peer: * " << std::to_string(i) << std::endl;
-
         Peer_List.push_back(std::move(std::make_unique<Peer>(i, Input_Info)));
     }
 
@@ -208,7 +206,7 @@ void Coordinator::reset()
     Time_Slots.Becon_Slot_Number = 1;
     Time_Slots.Cap_Slot_Number = Input_Info.cap_slot_num;
     Time_Slots.Cfp_Slot_Number = 0;
-    Time_Slots.Slot_Lenght = Input_Info.Slot_Lenght;
+    Time_Slots.Slot_Lenght = Input_Info.Slot_Duration;
 
     Cfp_Slot_Per = Input_Info.Cfp_Slot_Per;
 

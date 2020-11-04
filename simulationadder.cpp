@@ -27,24 +27,26 @@ void SimulationAdder::autoAddSimulationIncreasingCap(const InputInfo &Input)
 
             for(int i = 0; i<(int)input.Peer_List.size(); i++)
             {
-                double supported_datarate = (double)(PACKAGE_SIZE * 8) / input.Slot_Lenght;
 
-                double bit_per_slot = (double)(input.Slot_Lenght * supported_datarate);
+                double beacon_period_time = input.beacon_slot_num * input.Beacon_Slot_Lenght;
 
-                double estimated_datarate = (double)(bit_per_slot * input.Cfp_Slot_Per) /
-                        ((1 + input.cap_slot_num + (input.Peer_List.size() *input.Cfp_Slot_Per)) *
-                         input.Slot_Lenght);
+                double cap_period_time = input.cap_slot_num * input.Cap_Slot_Lenght;
 
-                int assumed_buffer = std::floor(
-                        ((input.Peer_List.size() * input.Cfp_Slot_Per) +
-                        input.cap_slot_num + 1) * (input.Slot_Lenght));
+                double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Lenght * input.Peer_List.size();
 
-                int rety_count = 5;
+                double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / input.Peer_List[i].Transmission_Delay;
 
-                input.Peer_List[i].Supported_DataRate = supported_datarate;
-                input.Peer_List[i].Desired_DataRate = estimated_datarate;
+                double estimated_data_rate = (total_package_per_cfp_slot * PACKAGE_SIZE * 8) * input.Cfp_Slot_Per
+                        /(beacon_period_time + cap_period_time + cfp_period_time);
+
+                double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
+                        total_package_per_cfp_slot;
+
+
+                input.Peer_List[i].Transmission_Delay = input.Peer_List[i].Transmission_Delay;
+                input.Peer_List[i].Desired_DataRate = estimated_data_rate;
                 input.Peer_List[i].Peer_Buffer = assumed_buffer;
-                input.Peer_List[i].Rety_Count = rety_count;
+                input.Peer_List[i].Rety_Count = input.Peer_List[i].Rety_Count;
 
 
             }
@@ -84,23 +86,26 @@ void SimulationAdder::autoAddSimulationIncreasingCfp(const InputInfo &Input)
 
             for(int i = 0; i<(int)input.Peer_List.size(); i++)
             {
-                double supported_datarate = (double)(PACKAGE_SIZE * 8) / input.Slot_Lenght;
 
-                double bit_per_slot = (double)(input.Slot_Lenght * supported_datarate);
+                double beacon_period_time = input.beacon_slot_num * input.Beacon_Slot_Lenght;
 
-                double estimated_datarate = (double)(bit_per_slot * input.Cfp_Slot_Per) /
-                        ((1 + input.cap_slot_num + (input.Peer_List.size() *input.Cfp_Slot_Per)) *
-                         input.Slot_Lenght);
+                double cap_period_time = input.cap_slot_num * input.Cap_Slot_Lenght;
 
-                int assumed_buffer = std::floor(
-                        ((input.Peer_List.size() * input.Cfp_Slot_Per) +
-                        input.cap_slot_num + 1) * (input.Slot_Lenght));
+                double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Lenght * input.Peer_List.size();
 
-                int rety_count = 5;
-                input.Peer_List[i].Supported_DataRate = supported_datarate;
-                input.Peer_List[i].Desired_DataRate = estimated_datarate;
+                double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / input.Peer_List[i].Transmission_Delay;
+
+                double estimated_data_rate = (total_package_per_cfp_slot * PACKAGE_SIZE * 8) * input.Cfp_Slot_Per
+                        /(beacon_period_time + cap_period_time + cfp_period_time);
+
+                double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
+                        total_package_per_cfp_slot;
+
+
+                input.Peer_List[i].Transmission_Delay = input.Peer_List[i].Transmission_Delay;
+                input.Peer_List[i].Desired_DataRate = estimated_data_rate;
                 input.Peer_List[i].Peer_Buffer = assumed_buffer;
-                input.Peer_List[i].Rety_Count = rety_count;
+                input.Peer_List[i].Rety_Count = input.Peer_List[i].Rety_Count;
 
 
             }
@@ -138,17 +143,24 @@ void SimulationAdder::autoAddSimulationIncreasingUser(const InputInfo &Input)
 
         for(int l=0; l<25; l++)
         {
-            double supported_datarate = (double)(PACKAGE_SIZE * 8) / input.Slot_Lenght;
 
-            double bit_per_slot = (double)(input.Slot_Lenght * supported_datarate);
+            double beacon_period_time = input.beacon_slot_num * input.Beacon_Slot_Lenght;
 
-            double estimated_datarate = (double)(bit_per_slot * input.Cfp_Slot_Per) /
-                    ((1 + input.cap_slot_num + (input.Peer_List.size() *input.Cfp_Slot_Per)) *
-                     input.Slot_Lenght);
+            double cap_period_time = input.cap_slot_num * input.Cap_Slot_Lenght;
 
-            int assumed_buffer = std::floor(
-                    ((input.Peer_List.size() * input.Cfp_Slot_Per) +
-                    input.cap_slot_num + 1) * (input.Slot_Lenght));
+            double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Lenght * input.Peer_List.size();
+
+            int transmission_delay = (double)(rand() % 300) / 100;
+
+            double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / transmission_delay;
+
+            double estimated_data_rate = (total_package_per_cfp_slot * PACKAGE_SIZE * 8) * input.Cfp_Slot_Per
+                    / (beacon_period_time + cap_period_time + cfp_period_time);
+
+
+            double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
+                    total_package_per_cfp_slot;
+
 
             int rety_count = 5;
 
@@ -157,8 +169,8 @@ void SimulationAdder::autoAddSimulationIncreasingUser(const InputInfo &Input)
             for(int i = 0; i<(int)input.Peer_List.size(); i++)
             {
 
-                input.Peer_List[i].Supported_DataRate = supported_datarate;
-                input.Peer_List[i].Desired_DataRate = estimated_datarate;
+                input.Peer_List[i].Transmission_Delay = transmission_delay;
+                input.Peer_List[i].Desired_DataRate = estimated_data_rate;
                 input.Peer_List[i].Peer_Buffer = assumed_buffer;
                 input.Peer_List[i].Rety_Count = rety_count;
 

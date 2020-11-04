@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <QDir>
 #include "QTimer"
+#include "logging.h"
 
 
 Simulation::Simulation(const InputInfo &Info) :
@@ -35,8 +36,6 @@ void Simulation::ping()
     if(Ping_Counter >= Input_Info.Slot_Duration)
     {
 
-//        std::cout << "ping - " << Input_Info.Simulation_Name.toStdString() << std::endl;
-
         Ping_Counter = 0;
         output = Coordinator_.ping();
 
@@ -66,7 +65,6 @@ void Simulation::resetSimulation()
         Peer_Simulation_Result.push_back(PeerSimulation(i, Input_Info));
 
 
-
     for(int i =0 ; i < (int)Input_Info.Peer_List.size(); i++)
     {
         Peer_Simulation_Result[i].setTitle(Input_Info.Simulation_Name);
@@ -80,7 +78,8 @@ void Simulation::resetSimulation()
 void Simulation::saveSimulation(const QString &UpperDir, const QString &MainDir)
 {
     QString dir ;
-    std::cout << "saveSimulation - " << Input_Info.Simulation_Name.toStdString() << std::endl;
+
+    Logging::printAll(Logging::white, "saveSimulation - ", Input_Info.Simulation_Name.toStdString());
 
 
     if(!QDir("graphs").exists())
@@ -141,7 +140,8 @@ void Simulation::setInputs(const InputInfo &Info)
 const PeerSimulationOutput &Simulation::getSimulationAvarageOutput()
 {
 
-    std::cout << "getSimulationAvarageOutput - " << Input_Info.Simulation_Name.toStdString() << std::endl;
+    Logging::printAll(Logging::white, "getSimulationAvarageOutput - ", Input_Info.Simulation_Name.toStdString());
+
 
     if(Peer_Simulation_Result.size() > 0)
     {

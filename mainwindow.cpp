@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QMessageBox>
+#include "logging.h"
 #include "ui_mainwindow.h"
 
 MainWindow::MainWindow(QWidget *parent)
@@ -10,6 +11,8 @@ MainWindow::MainWindow(QWidget *parent)
       Simulation_Adder(this)
 {
     MainWindow_Ui->setupUi(this);
+
+
 
     Progress_Timer = new QTimer(this);
 
@@ -51,7 +54,6 @@ MainWindow::MainWindow(QWidget *parent)
     Current_Simulation_Progress = 0;
     Progress_Duration = 0;
 
-    //std::cout << "MainWindow::"<<  std::endl;
     MainWindow_Ui->simulation_progress->setValue(0);
 
 
@@ -326,7 +328,8 @@ void MainWindow::clearListButtonClicked()
 
 void MainWindow::processEndOf()
 {
-    std::cout <<" All Simulations are done" << std::endl;
+    Logging::printAll(Logging::white, " All Simulations are done" );
+
     Total_Result_Window.saveGraphtoFile("graphs", MainWindow_Ui->simulation_name->text());
     Total_Result_Window.show();
 
@@ -344,7 +347,8 @@ void MainWindow::processEndOf()
 
 void MainWindow::processCurrentSimulationListOutput()
 {
-    std::cout <<" Current Simulation List Array is done" << std::endl;
+
+    Logging::printAll(Logging::white, " Current Simulation List Array is done" );
 
     PeerSimulationOutput output =  Simulation_Result_Windows[Current_Simulation_Array]->
             getOutput();
@@ -383,7 +387,8 @@ void MainWindow::processCurrentSimulationOutput(Simulation *Sim)
 
     int operator_id = Sim->Operator_Id;
 
-    std::cout <<" Current Simulation is finished" << std::endl;
+    Logging::printAll(Logging::white, " Current Simulation is finished" );
+
 
     const PeerSimulationOutput &output = Sim->getSimulationAvarageOutput();
 

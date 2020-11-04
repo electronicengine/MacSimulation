@@ -1,9 +1,12 @@
 #include "peer.h"
 #include "coordinator.h"
 #include "QRandomGenerator"
+#include "logging.h"
+
 #include <iostream>
 #include <cstdlib>
 #include <ctime>
+
 
 
 Peer::Peer(int Id, const InputInfo &Input) :
@@ -14,11 +17,9 @@ Peer::Peer(int Id, const InputInfo &Input) :
     Total_Package_Sent = 0;
     Queued_Packets = 0;
     Rety_Count = 0;
-    Cfp_Slot_Start = 0;
-    Cfp_Slot_Lenght = 0;
+    Own_Cfp_Slot_Start = 0;
+    Own_Cfp_Slot_Lenght = 0;
     Contantion_Window = 0;
-    SuperFrame_Slot_Number = 1;
-    Total_Slot_Number = 0;
     Reservation_Count = 0;
     Failed_Reservation = 0;
     Reservation_Succesfull = false;
@@ -27,27 +28,29 @@ Peer::Peer(int Id, const InputInfo &Input) :
     Cap_Request = 0;
     Collusion = 0;
     Dropped_Packages = 0;
-    Delay_Counter = 1;
     Random_Slot_Selected = false;
     Total_Package_Generated = 0;
+    Total_Beacon_Slot_Number = 0;
+    Total_Cap_Slot_Number = 0;
+    Total_Cfp_Slot_Number = 0;
+    Past_Time = 0;
 
     Data_Sent = true;
 
     Peer_Id = Id;
     Max_Rety_Count = Input.Peer_List[Id].Rety_Count;
     Desired_DataRate = Input.Peer_List[Id].Desired_DataRate;
-    Supported_DataRate = Input.Peer_List[Id].Supported_DataRate;
+    Transmission_Delay = Input.Peer_List[Id].Transmission_Delay;
     Available_Buffer = Input.Peer_List[Id].Peer_Buffer;
     Enabled_BufferOverflow = Input.Enable_Buffer_Overflow;
-    Slot_Lenght = Input.Slot_Lenght;
 
-    PackageTransfer_PerSlot = ((double)(Supported_DataRate * (double)(Slot_Lenght))) /
-                               (PACKAGE_SIZE * 8);
+    Beacon_Slot_Lenght = Input.Beacon_Slot_Lenght;
+    Cap_Slot_Lenght = Input.Cap_Slot_Lenght;
+    Cfp_Slot_Lenght = Input.Cfp_Slot_Lenght;
 
+    PackageTransfer_PerSlot = ((double)((Cfp_Slot_Lenght) / Transmission_Delay));
 
-//    std::cout << "PackageTransfer_PerSlot : " << std::to_string(PackageTransfer_PerSlot) <<
-//                 " - Slot Lenght : " << std::to_string(Slot_Lenght) << std::endl;
-    //std::cout << "Peer::"<<  std::endl;
+    Logging::printAll((Logging::LogColor)Id, "PackageTransfer_PerSlot : ", std::to_string(PackageTransfer_PerSlot));
 
 }
 
@@ -55,7 +58,6 @@ Peer::Peer(int Id, const InputInfo &Input) :
 
 Peer::~Peer()
 {
-    //std::cout << "Peer::~"<<  std::endl;
 }
 
 
@@ -63,21 +65,20 @@ Peer::~Peer()
 PeerOutput *Peer::beacon(const TimeSlots &Slots)
 {
 
+    Total_Beacon_Slot_Number++;
     Time_Slots = const_cast<TimeSlots *>(&Slots);
 
     generatePackage();
 
-//    std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Beacon " << std::endl;
+    Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id), " - Beacon ");
 
     Reservation_Succesfull = false;
     getRandomSlot();
 
-    Total_Slot_Number += SuperFrame_Slot_Number;
     Peer_Output.Data_Rate = (double)(Total_Package_Sent * PACKAGE_SIZE * 8 )
-            / (Total_Slot_Number * Slot_Lenght); // in KBPS
-
-    SuperFrame_Slot_Number = 1;
-    Slot_Counter++;
+            / ((Total_Beacon_Slot_Number * Beacon_Slot_Lenght) +
+               (Total_Cap_Slot_Number * Cap_Slot_Lenght) +
+               (Total_Cfp_Slot_Number * Cfp_Slot_Lenght));
 
 
     return &Peer_Output;
@@ -88,16 +89,17 @@ PeerOutput *Peer::beacon(const TimeSlots &Slots)
 int Peer::cap(int SlotNumber)
 {
 
-//    std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Cap Slot Num: " << std::to_string(SlotNumber) << std::endl;
-    (void)SlotNumber;
+    Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                      " - Cap Slot Num: ", std::to_string(SlotNumber));
 
-    SuperFrame_Slot_Number++;
-    Slot_Counter++;
+
+    Total_Cap_Slot_Number++;
 
     if(Random_CapSlot == 0 && Reservation_Succesfull != true && Queued_Packets > 1 &&
             Random_Slot_Selected == true)
     {
-//        std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Aloha Send " << std::endl;
+        Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id), " - Aloha Send ");
+
 
         Random_Slot_Selected = false;
 
@@ -120,40 +122,47 @@ int Peer::cap(int SlotNumber)
 
 int Peer::cfp(int SlotNumber)
 {
-//    std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Cfp Slot Num: " << std::to_string(SlotNumber) << std::endl;
+    Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id), " - Cfp Slot Num: ", std::to_string(SlotNumber));
 
-    SuperFrame_Slot_Number++;
-    Slot_Counter++;
+    Total_Cfp_Slot_Number++;
 
-    if((SlotNumber >= Cfp_Slot_Start) &&
-            (SlotNumber < (Cfp_Slot_Start + Cfp_Slot_Lenght)))
+    int total_time = (Beacon_Slot_Lenght * Total_Beacon_Slot_Number) +
+            (Cap_Slot_Lenght * Total_Cap_Slot_Number) +
+            (Cfp_Slot_Lenght * Total_Cfp_Slot_Number);
+
+
+    if((SlotNumber >= Own_Cfp_Slot_Start) &&
+            (SlotNumber < (Own_Cfp_Slot_Start + Own_Cfp_Slot_Lenght)))
     {
 
         if(std::floor(Queued_Packets) != 0)
         {
-            if(SlotNumber == Cfp_Slot_Start && Data_Sent == false)
+            if(SlotNumber == Own_Cfp_Slot_Start && Data_Sent == false)
             {
-                Peer_Output.Delay_ = Slot_Counter - Delay_Counter;
+                Peer_Output.Delay_ = total_time - Delay_Time;
                 Data_Sent = true;
             }
 
 
-            if(SlotNumber == (Cfp_Slot_Lenght + Cfp_Slot_Start - 1)) // in the last cfp slot
+            if(SlotNumber == (Own_Cfp_Slot_Lenght + Own_Cfp_Slot_Start - 1)) // in the last cfp slot
             {
-                int rounded = std::floor(Cfp_Slot_Lenght * PackageTransfer_PerSlot);
+                int rounded = std::floor(Own_Cfp_Slot_Lenght * PackageTransfer_PerSlot);
+
+                if(rounded > Queued_Packets)
+                    rounded = std::floor(Queued_Packets);
 
                 Queued_Packets = Queued_Packets - rounded;
                 Total_Package_Sent = Total_Package_Sent + rounded;
                 Peer_Output.Total_Package_Sent = (double)Total_Package_Sent / Total_Package_Generated;
 
-//                std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Sending Package Number: " <<
-//                             rounded << std::endl;
-//                std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Queue Number: " <<
-//                             Queued_Packets << std::endl;
+                Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                                  " - Sending Package Number: ", rounded );
+                Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                                  " - Queue Number: ", Queued_Packets);
 
 
-                Cfp_Slot_Lenght = 0;
-                Cfp_Slot_Start = 0;
+                Own_Cfp_Slot_Lenght = 0;
+                Own_Cfp_Slot_Start = 0;
 
             }
         }
@@ -168,16 +177,20 @@ void Peer::callBackCapResponse(bool CollutionOccured, int CfpSlotStart, int Slot
 {
     if(CollutionOccured == false)
     {
-//        std::cout << "Peer Id " << std::to_string(Peer_Id) << " - CallBackResponse" << std::endl;
-//        std::cout << "Peer Id " << std::to_string(Peer_Id) << " - CfpSlotStart " << std::to_string(CfpSlotStart) << std::endl;
-//        std::cout << "Peer Id " << std::to_string(Peer_Id) << " - SlotLenght " << std::to_string(SlotLenght) << std::endl;
+        Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                          " - CallBackResponse");
+        Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                          " - CfpSlotStart ", std::to_string(CfpSlotStart));
+        Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                          " - SlotLenght ", std::to_string(SlotLenght));
+
 
         Reservation_Succesfull = true;
         Reservation_Count++;
 
         Contantion_Window = 0;
-        Cfp_Slot_Start = CfpSlotStart;
-        Cfp_Slot_Lenght = SlotLenght;
+        Own_Cfp_Slot_Start = CfpSlotStart;
+        Own_Cfp_Slot_Lenght = SlotLenght;
         Random_CapSlot = 0;
 
     }
@@ -194,12 +207,14 @@ void Peer::callBackCapResponse(bool CollutionOccured, int CfpSlotStart, int Slot
             Failed_Reservation++;
 
            Peer_Output.Unsuccessful_Reservation = (Failed_Reservation / (Reservation_Count + Failed_Reservation));
-//            std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Rety Count is Overflowed" << std::endl;
+           Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                             " - Rety Count is Overflowed");
+
             Rety_Count = 0;
             Contantion_Window = 0;
         }
 
-//        std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Collution Occured" << std::endl;
+        Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id), " - Collution Occured");
 
         if(Contantion_Window != 0)
             Contantion_Window *= 2;
@@ -220,18 +235,16 @@ void Peer::reset()
     Total_Package_Sent = 0;
     Queued_Packets = 0;
     Rety_Count = 0;
-    Cfp_Slot_Start = 0;
-    Cfp_Slot_Lenght = 0;
+    Own_Cfp_Slot_Start = 0;
+    Own_Cfp_Slot_Lenght = 0;
     Contantion_Window = 0;
-    SuperFrame_Slot_Number = 1;
-    Total_Slot_Number = 0;
     Reservation_Succesfull = false;
     Random_CapSlot = 0;
     Slot_Counter = 0;
     Cap_Request = 0;
     Collusion = 0;
     Dropped_Packages = 0;
-    Delay_Counter = 1;
+    Past_Time = 0;
 
     Data_Sent = true;
 
@@ -254,8 +267,10 @@ void Peer::getRandomSlot()
 
         Random_CapSlot = rand() % Contantion_Window;
 
-//        std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Random Slot Selected: "
-//                  << std::to_string(Random_CapSlot) << "- Contantion Window: " << std::to_string(Contantion_Window) << std::endl;
+        Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                          " - Random Slot Selected: ",std::to_string(Random_CapSlot), "- Contantion Window: ",
+                          std::to_string(Contantion_Window));
+
     }
 }
 
@@ -264,20 +279,23 @@ void Peer::getRandomSlot()
 void Peer::generatePackage()
 {
 
+    double total_time = (Beacon_Slot_Lenght * (double)Total_Beacon_Slot_Number) +
+            (Cap_Slot_Lenght * (double)Total_Cap_Slot_Number) +
+            (Cfp_Slot_Lenght * (double)Total_Cfp_Slot_Number);
 
-    double per_slot_bit = (double) Desired_DataRate * Slot_Lenght;
-//    std::cout << "Peer Id " << std::to_string(Peer_Id)
-//              << "per_slot_bit: " << std::to_string(per_slot_bit) << std::endl;
-    double per_slot_pack = (double) per_slot_bit / (PACKAGE_SIZE * 8);
-//    std::cout << "Peer Id " << std::to_string(Peer_Id)
-//              << "per_slot_pack: " << std::to_string(per_slot_pack) << std::endl;
+    Past_Time = total_time - Past_Time;
 
+    Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                      " - Total_Time: ", std::to_string(total_time), " ms",
+                      " - Past_Time: ", std::to_string(Past_Time), " ms");
 
-    Queued_Packets += per_slot_pack * (SuperFrame_Slot_Number);
-    Total_Package_Generated += (per_slot_pack * (SuperFrame_Slot_Number));
+    Queued_Packets += (double) (Desired_DataRate * Past_Time) / (PACKAGE_SIZE * 8);
 
-//    std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Number Of Package: "
-//              << std::to_string(Queued_Packets) << " generated" << std::endl;
+    Total_Package_Generated += (double) (Desired_DataRate * Past_Time) / (PACKAGE_SIZE * 8);
+
+    Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id), " - Number Of Package: "
+                      , std::to_string(Queued_Packets), " generated");
+
 
     if(Enabled_BufferOverflow == true)
     {
@@ -285,8 +303,9 @@ void Peer::generatePackage()
         {
             Dropped_Packages += (std::floor(Queued_Packets) - Available_Buffer);
 
-//            std::cout << "Peer Id " << std::to_string(Peer_Id) << " - Number Of Package: "
-//                      << std::to_string(Dropped_Packages) << " dropped" << std::endl;
+            Logging::printAll((Logging::LogColor)Peer_Id, "Peer Id ", std::to_string(Peer_Id),
+                              " - Number Of Package: ", std::to_string(Dropped_Packages), " dropped");
+
 
             double remain = Queued_Packets - (std::floor(Queued_Packets) - Available_Buffer)
                     - Available_Buffer;
@@ -301,8 +320,10 @@ void Peer::generatePackage()
 
     if(Data_Sent == true)
     {
-        Delay_Counter = Slot_Counter;
+        Delay_Time = total_time;
         Data_Sent = false;
     }
+
+    Past_Time = total_time;
 
 }

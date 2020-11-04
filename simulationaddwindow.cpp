@@ -14,13 +14,11 @@ SimulationAddWindow::SimulationAddWindow(QWidget *parent) :
     connect(ui->buttonBox, SIGNAL(accepted()), this, SLOT(acceptedButtonClicked()));
     connect(ui->buttonBox, SIGNAL(rejected()), this, SLOT(rejectedButtonClicked()));
     connect(ui->user_add_button, SIGNAL(clicked()), this, SLOT(userAddButtonClicked()));
-    connect(ui->auto_add_button, SIGNAL(clicked()), this, SLOT(autoAddButtonClicked()));
     connect(ui->clear_list_button, SIGNAL(clicked()), this, SLOT(clearListClicked()));
 
     Edit_Enable = false;
     Main_Window = dynamic_cast<MainWindow *>(parent);
 
-    //std::cout << "SimulationAddWindow::"<<  std::endl;
 
 }
 
@@ -28,7 +26,6 @@ SimulationAddWindow::SimulationAddWindow(QWidget *parent) :
 
 SimulationAddWindow::~SimulationAddWindow()
 {
-    //std::cout << "SimulationAddWindow::~"<<  std::endl;
 
     delete ui;
 }
@@ -40,7 +37,11 @@ void SimulationAddWindow::acceptedButtonClicked()
 
     Input_Info.cap_slot_num = ui->cap_slot_box->value();
     Input_Info.Cfp_Slot_Per = ui->cfp_lot_box->value();
-    Input_Info.Slot_Lenght = ui->slot_lenght->value();
+    Input_Info.beacon_slot_num = ui->beacon_slot_box->value();
+
+    Input_Info.Cap_Slot_Lenght = ui->cap_slot_lenght->value();
+    Input_Info.Cfp_Slot_Lenght = ui->cfp_slot_lenght->value();
+    Input_Info.Beacon_Slot_Lenght = ui->beacon_slot_lenght->value();
     Input_Info.Slot_Duration = ui->slot_duration->value();
     Input_Info.Simulation_Duration = ui->simulation_duration_box->value();
     Input_Info.Simulation_Name = ui->simulation_name_box->text();
@@ -70,12 +71,6 @@ void SimulationAddWindow::rejectedButtonClicked()
 
 void SimulationAddWindow::userAddButtonClicked()
 {
-    double estimated_datarate = (double)((PACKAGE_SIZE * 8) * ui->cfp_lot_box->value()) /
-            ((1 + ui->cap_slot_box->value() + (ui->user_number_box->value() * ui->cfp_lot_box->value())) * ui->slot_lenght->value());
-
-    std::cout << "estimated_datarate: " << std::to_string(estimated_datarate) << std::endl;
-
-    ui->estimated_datarate->setText(QString::number(estimated_datarate));
     User_Add_Window.show();
 }
 
@@ -83,35 +78,8 @@ void SimulationAddWindow::userAddButtonClicked()
 
 void SimulationAddWindow::autoAddButtonClicked()
 {
-    double supported_datarate = (double)(PACKAGE_SIZE * 8) / ui->slot_lenght->value();
-
-    double bit_sent_per_slot = (double)(ui->slot_lenght->value() * supported_datarate);
-
-    double estimated_datarate = (double)(bit_sent_per_slot * ui->cfp_lot_box->value()) /
-            ((1 + ui->cap_slot_box->value() + (ui->user_number_box->value() * ui->cfp_lot_box->value())) * ui->slot_lenght->value());
-
-    int assumed_buffer = std::floor(
-            ((ui->user_number_box->value() * ui->cfp_lot_box->value()) +
-            ui->cap_slot_box->value() + 1) * (ui->slot_lenght->value()));
-
-    int rety_count = 5;
-
-    ui->estimated_datarate->setText(QString::number(estimated_datarate));
-
-    std::cout << "estimated_datarate: " << std::to_string(estimated_datarate) << std::endl;
-
-    for(int i=0; i<ui->user_number_box->value(); i++)
-    {
-
-        ui->user_list->addItem("Peer - " + QString::number(Input_Info.Peer_List.size()) +
-                               " - Desired: " + QString::number(estimated_datarate) + " KBPS - Supported: " +
-                               QString::number(supported_datarate) +
-                                                                                         " KBPS - Buffer: " +
-                               QString::number(assumed_buffer) + " Packages");
 
 
-        Input_Info.Peer_List.push_back(PeerInfo{estimated_datarate, supported_datarate, assumed_buffer, rety_count});
-    }
 
 }
 
@@ -131,9 +99,9 @@ void SimulationAddWindow::userAddCallBack(PeerInfo Info)
 {
 
     ui->user_list->addItem("Peer - " + QString::number(Input_Info.Peer_List.size()) +
-                           " - Desired: " + QString::number(Info.Desired_DataRate) + " KBPS - Supported: " +
-                           QString::number(Info.Supported_DataRate) +
-                                                                                     " KBPS - Buffer: " +
+                           " - Desired: " + QString::number(Info.Desired_DataRate) + " KBPS - Transmission Delay: " +
+                           QString::number(Info.Transmission_Delay) +
+                                                                                     " ms - Buffer: " +
                            QString::number(Info.Peer_Buffer) + " Packages");
 
     Input_Info.Peer_List.push_back(Info);
@@ -146,7 +114,10 @@ void SimulationAddWindow::editSimulationInputs(int Index, const InputInfo &Input
 {
     ui->cap_slot_box->setValue(Inputs.cap_slot_num);
     ui->cfp_lot_box->setValue(Inputs.Cfp_Slot_Per);
-    ui->slot_lenght->setValue(Inputs.Slot_Lenght);
+    ui->beacon_slot_box->setValue(Inputs.beacon_slot_num);
+    ui->cap_slot_lenght->setValue(Inputs.Cap_Slot_Lenght);
+    ui->cfp_slot_lenght->setValue(Inputs.Cfp_Slot_Lenght);
+    ui->beacon_slot_lenght->setValue(Inputs.Beacon_Slot_Lenght);
     ui->slot_duration->setValue(Inputs.Slot_Duration);
     ui->simulation_duration_box->setValue(Inputs.Simulation_Duration);
     ui->simulation_name_box->setText(Inputs.Simulation_Name);

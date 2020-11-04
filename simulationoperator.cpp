@@ -1,5 +1,6 @@
 #include "simulationoperator.h"
 #include "mainwindow.h"
+#include "logging.h"
 
 SimulationOperator::SimulationOperator(int Id, MainWindow *Window) : QObject(Window)
 {
@@ -28,7 +29,8 @@ void SimulationOperator::start(Simulation *Sim)
     }
     else
     {
-        std::cout << "Operator: " << Operator_Id << " - Simulations are done" << std::endl;
+        Logging::printAll(Logging::white, "Operator: ", Operator_Id, " - Simulations are done");
+
         Timer_->stop();
         Terminate_ = true;
         Ping_Counter = 0;
@@ -47,7 +49,8 @@ void SimulationOperator::ping()
         Ping_Counter = 0;
         Simulation_Duration = 0;
         Current_Simulation_Pointer = nullptr;
-        std::cout << "Operator: " << Operator_Id << " Terminated" << std::endl;
+
+        Logging::printAll(Logging::white, "Operator: ", Operator_Id, " - Terminated");
 
         return;
     }

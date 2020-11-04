@@ -4,7 +4,7 @@
 #include <memory>
 #include <QRandomGenerator>
 
-#define PACKAGE_SIZE    2000    //bytes
+#define PACKAGE_SIZE    2048    //bytes
 
 
 struct TimeSlots;
@@ -41,7 +41,7 @@ class Peer
 public:
 
     double Desired_DataRate;
-    double Supported_DataRate;
+    double Transmission_Delay;
     double PackageTransfer_PerSlot;
     int Current_DataRate;
     int Available_Buffer;
@@ -52,14 +52,18 @@ public:
     double Total_Package_Sent;
     double Failed_Reservation;
     double Reservation_Count;
-    int SuperFrame_Slot_Number;
-    int Total_Slot_Number;
-    double Slot_Lenght;
+    int Total_Beacon_Slot_Number;
+    double Beacon_Slot_Lenght;
+    int Total_Cap_Slot_Number;
+    double Cap_Slot_Lenght;
+    int Total_Cfp_Slot_Number;
+    double Cfp_Slot_Lenght;
     int Slot_Counter;
     int Cap_Request;
     int Collusion;
-    int Delay_Counter;
     int Max_Rety_Count;
+    double Past_Time;
+    double Delay_Time;
 
     bool Data_Sent;
     bool Enabled_BufferOverflow;
@@ -85,8 +89,8 @@ private:
 
     volatile bool Reservation_Succesfull;
 
-    volatile int Cfp_Slot_Start;
-    volatile int Cfp_Slot_Lenght;
+    volatile int Own_Cfp_Slot_Start;
+    volatile int Own_Cfp_Slot_Lenght;
 
     TimeSlots *Time_Slots;
 

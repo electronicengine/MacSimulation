@@ -20,6 +20,7 @@ public:
 private slots:
     void acceptedButtonClicked();
     void rejectedButtonClicked();
+    void transmissionDelayChanged(double);
 
 
 private:
