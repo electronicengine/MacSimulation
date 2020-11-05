@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include <QMessageBox>
+#include <QFileDialog>
 #include "logging.h"
 #include "ui_mainwindow.h"
 
@@ -42,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(MainWindow_Ui->simulation_add_button, SIGNAL(clicked()), this, SLOT(simulationAddButtonClicked()));
     connect(MainWindow_Ui->clear_list_button, SIGNAL(clicked()), this, SLOT(clearListButtonClicked()));
     connect(MainWindow_Ui->clear_array_button, SIGNAL(clicked()), this, SLOT(clearArrayButtonClicked()));
+    connect(MainWindow_Ui->open_graph_button, SIGNAL(clicked()), this, SLOT(openGraphButtonClicked()));
 
     connect(MainWindow_Ui->simulation_array_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
             this, SLOT(simulationArrayListDoubleClicked(QListWidgetItem*)));
@@ -307,6 +309,71 @@ void MainWindow::progressBarUpdate()
     Current_Simulation_Progress++;
 
 }
+
+
+
+void MainWindow::openGraphButtonClicked()
+{
+    int line_counter = 0;
+    QString line_name;
+    QString file_name = QFileDialog::getOpenFileName(this);
+    PeerSimulationOutput output;
+
+    Simulation_Result_Window = new SimulationResultWindow("result");
+
+    QFile inputFile(file_name);
+    if (inputFile.open(QIODevice::ReadOnly))
+    {
+       QTextStream in(&inputFile);
+       while (!in.atEnd())
+       {
+
+          QString line = in.readLine();
+
+          if(line_counter != 0)
+          {
+            QStringList data_str = line.split("\t\t ");
+
+            for(int i=0; i<data_str.size(); i++)
+            {
+                switch (i)
+                {
+                case 0:
+                    line_name = data_str.at(i);
+                    break;
+                case 1:
+                    output.Max_Total_Collusion_Value = data_str.at(i).toDouble();
+                    break;
+                case 2:
+                    output.Max_Buffer_Value = data_str.at(i).toDouble();
+                    break;
+                case 3:
+                    output.Max_DataRate_Value = data_str.at(i).toDouble();
+                    break;
+                case 4:
+                    output.Max_Delay = data_str.at(i).toDouble();
+                    break;
+                case 5:
+                    output.Max_Dropped_Package_Value = data_str.at(i).toDouble();
+                    break;
+                case 6:
+                    output.Max_Unsuccesfull_Reservation = data_str.at(i).toDouble();
+                    break;
+                }
+            }
+          }
+
+          Simulation_Result_Window->refreshValues(output, line_name);
+          line_counter++;
+       }
+       inputFile.close();
+       Simulation_Result_Window->show();
+
+    }
+
+
+}
+
 
 
 void MainWindow::simulationAddButtonClicked()

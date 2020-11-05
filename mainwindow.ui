@@ -920,6 +920,93 @@ border-image: url(:/images/toggle_button_off.png);
      <bool>false</bool>
     </property>
    </widget>
+   <widget class="QPushButton" name="open_graph_button">
+    <property name="geometry">
+     <rect>
+      <x>450</x>
+      <y>410</y>
+      <width>61</width>
+      <height>61</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#open_graph_button
+{
+border-image: url(:/images/show_unpressed.png);
+}
+#open_graph_button:pressed
+{
+border-image: url(:/images/show_pressed.png);
+}
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_18">
+    <property name="geometry">
+     <rect>
+      <x>440</x>
+      <y>480</y>
+      <width>91</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">color: rgb(114, 159, 207);</string>
+    </property>
+    <property name="text">
+     <string>Open Graph</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_19">
+    <property name="geometry">
+     <rect>
+      <x>680</x>
+      <y>450</y>
+      <width>101</width>
+      <height>19</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Enable Graph</string>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="enable_graph">
+    <property name="geometry">
+     <rect>
+      <x>690</x>
+      <y>470</y>
+      <width>71</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">#enable_graph:checked
+{
+border-image: url(:/images/toggle_button_on.png);
+}
+#enable_graph
+{
+border-image: url(:/images/toggle_button_off.png);
+}
+
+</string>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="checkable">
+     <bool>true</bool>
+    </property>
+    <property name="checked">
+     <bool>true</bool>
+    </property>
+    <property name="autoRepeat">
+     <bool>false</bool>
+    </property>
+   </widget>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionedit">

@@ -100,9 +100,9 @@ void PeerSimulation::saveGraphInfo(const QString &Dir)
         for(int i = 0; i<Sample_Count; i++)
         {
             out << i
-                << "\t\t " << QString::number(Collution_Values[i].y()).leftJustified(8,'0')
+                << "\t\t " << QString::number(Collution_Values[i].y()).rightJustified(8,'0')
                 << "\t\t " << QString::number(Buffer_Values[i].y()).rightJustified(8,'0')
-                << "\t\t " << QString::number(DataRate_Values[i].y()).leftJustified(8,'0')
+                << "\t\t " << QString::number(DataRate_Values[i].y()).rightJustified(8,'0')
                 << "\t\t " << QString::number(Delay_Values[i].y()).rightJustified(8,'0')
                 << "\t\t " << QString::number(Dropped_Pack_Values[i].y()).rightJustified(8,'0')
                 << "\t\t " << QString::number(Reservation_Values[i].y()).rightJustified(8,'0')

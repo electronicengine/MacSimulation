@@ -154,7 +154,7 @@ void SimulationResultWindow::setupDelayGraph()
 
     Delay_Chart->legend()->hide();
     Delay_Chart->addSeries(Delay_Series.get());
-    Delay_Chart->setTitle("Latency (Slot Number)");
+    Delay_Chart->setTitle("Latency (ms)");
     Delay_Chart->createDefaultAxes();
     Delay_Chart->axes(Qt::Horizontal).back()->setGridLineVisible(false);
     Delay_Chart->axes(Qt::Horizontal).back()->setLabelsColor(QColor(114, 159, 207));
