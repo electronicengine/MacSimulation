@@ -18,7 +18,7 @@ public:
     ~Simulation();    
     void ping();
     void resetSimulation();
-    void saveSimulation(const QString &UpperDir, const QString &MainDir);
+    void saveSimulation(const QString &HomeDir, const QString &UpperDir, const QString &MainDir);
     void setInputs(const InputInfo &Info);
     const PeerSimulationOutput &getSimulationAvarageOutput();
     InputInfo Input_Info;

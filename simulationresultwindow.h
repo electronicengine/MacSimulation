@@ -30,7 +30,34 @@ public:
     PeerSimulationOutput getOutput();
     void refreshValues(const PeerSimulationOutput &Output, const QString &Name);
     void setFormTitle(const QString &Title);
-    void saveGraphtoFile(const QString &UpperDir, const QString &Title);
+    void saveGraphtoFile(const QString &HomeDir, const QString &UpperDir, const QString &Title);
+
+
+public slots:
+
+    void closeButton1Clicked();
+    void nextButton1Clicked();
+    void previousButton1Clicked();
+
+    void closeButton2Clicked();
+    void nextButton2Clicked();
+    void previousButton2Clicked();
+
+    void closeButton3Clicked();
+    void nextButton3Clicked();
+    void previousButton3Clicked();
+
+    void closeButton4Clicked();
+    void nextButton4Clicked();
+    void previousButton4Clicked();
+
+    void closeButton5Clicked();
+    void nextButton5Clicked();
+    void previousButton5Clicked();
+
+    void closeButton6Clicked();
+    void nextButton6Clicked();
+    void previousButton6Clicked();
 
 private:
     Ui::SimulationResultWindow *ui;

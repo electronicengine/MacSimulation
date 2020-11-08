@@ -57,5 +57,8 @@ RESOURCES += \
     images.qrc
 
 DISTFILES += \
+    AndroidManifest.xml \
     images/show_pressed.png \
     images/show_unpressed.png
+
+ANDROID_ABIS = armeabi-v7a

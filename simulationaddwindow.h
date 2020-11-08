@@ -7,7 +7,7 @@
 
 
 
-struct MainWindow;
+class MainWindow;
 
 namespace Ui {
 class SimulationAddWindow;

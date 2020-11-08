@@ -32,5 +32,6 @@
         <file>images/pass_previous_pressed.png</file>
         <file>images/pass_previous_unpressed.png</file>
         <file>images/pass_unpressed.png</file>
+        <file>AndroidManifest.xml</file>
     </qresource>
 </RCC>

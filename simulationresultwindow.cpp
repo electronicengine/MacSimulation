@@ -1,4 +1,5 @@
 #include <QDir>
+#include <QScreen>
 #include "peersimulation.h"
 #include "simulationresultwindow.h"
 #include "ui_simulationresultwindow.h"
@@ -29,9 +30,36 @@ SimulationResultWindow::SimulationResultWindow(const QString &Title, QWidget *pa
     setupDroppedPackGraph();
     setupReservationGraph();
 
+    QScreen *screen = QApplication::screens().at(0);
+
+    ui->stackedWidget->resize(screen->availableGeometry().width(), screen->availableGeometry().height() - 80);
+
     Avarage_Delay_Series = std::make_unique<QLineSeries>();
     Total_Package_Sent_Series = std::make_unique<QLineSeries>();
 
+    connect(ui->close_button_1, SIGNAL(clicked()), this, SLOT(closeButton1Clicked()));
+    connect(ui->next_button_1, SIGNAL(clicked()), this, SLOT(nextButton1Clicked()));
+    connect(ui->previous_button_1, SIGNAL(clicked()), this, SLOT(previousButton1Clicked()));
+
+    connect(ui->close_button_2, SIGNAL(clicked()), this, SLOT(closeButton2Clicked()));
+    connect(ui->next_button_2, SIGNAL(clicked()), this, SLOT(nextButton2Clicked()));
+    connect(ui->previous_button_2, SIGNAL(clicked()), this, SLOT(previousButton2Clicked()));
+
+    connect(ui->close_button_3, SIGNAL(clicked()), this, SLOT(closeButton3Clicked()));
+    connect(ui->next_button_3, SIGNAL(clicked()), this, SLOT(nextButton3Clicked()));
+    connect(ui->previous_button_3, SIGNAL(clicked()), this, SLOT(previousButton3Clicked()));
+
+    connect(ui->close_button_4, SIGNAL(clicked()), this, SLOT(closeButton4Clicked()));
+    connect(ui->next_button_4, SIGNAL(clicked()), this, SLOT(nextButton4Clicked()));
+    connect(ui->previous_button_4, SIGNAL(clicked()), this, SLOT(previousButton4Clicked()));
+
+    connect(ui->close_button_5, SIGNAL(clicked()), this, SLOT(closeButton5Clicked()));
+    connect(ui->next_button_5, SIGNAL(clicked()), this, SLOT(nextButton5Clicked()));
+    connect(ui->previous_button_5, SIGNAL(clicked()), this, SLOT(previousButton5Clicked()));
+
+    connect(ui->close_button_6, SIGNAL(clicked()), this, SLOT(closeButton6Clicked()));
+    connect(ui->next_button_6, SIGNAL(clicked()), this, SLOT(nextButton6Clicked()));
+    connect(ui->previous_button_6, SIGNAL(clicked()), this, SLOT(previousButton6Clicked()));
 
     this->setFormTitle(Title);
 
@@ -101,6 +129,7 @@ void SimulationResultWindow::setupCollusionGraph()
     Collusion_Chart->setPlotAreaBackgroundBrush(QBrush(QColor(46, 52, 54)));
 
     Collusion_Chart_View->setRenderHint(QPainter::Antialiasing);
+    ui->collusion_graph_peer->resize(this->size().width(), this->size().height() - 140);
     Collusion_Chart_View->setParent(ui->collusion_graph_peer);
     Collusion_Chart_View->resize(ui->collusion_graph_peer->size());
 
@@ -134,6 +163,8 @@ void SimulationResultWindow::setupDataRateGraph()
     DataRate_Chart->setPlotAreaBackgroundBrush(QBrush(QColor(46, 52, 54)));
 
     DataRate_Chart_View->setRenderHint(QPainter::Antialiasing);
+    ui->datarate_graph->resize(this->size().width(), this->size().height() - 140);
+
     DataRate_Chart_View->setParent(ui->datarate_graph);
     DataRate_Chart_View->resize(ui->datarate_graph->size());
 
@@ -167,6 +198,8 @@ void SimulationResultWindow::setupDelayGraph()
     Delay_Chart->setPlotAreaBackgroundBrush(QBrush(QColor(46, 52, 54)));
 
     Delay_Chart_View->setRenderHint(QPainter::Antialiasing);
+    ui->delay_graph->resize(this->size().width(), this->size().height() - 140);
+
     Delay_Chart_View->setParent(ui->delay_graph);
     Delay_Chart_View->resize(ui->delay_graph->size());
 
@@ -200,10 +233,11 @@ void SimulationResultWindow::setupBufferGraph()
     Buffer_Chart->setPlotAreaBackgroundBrush(QBrush(QColor(46, 52, 54)));
 
     Buffer_Chart_View->setRenderHint(QPainter::Antialiasing);
+    ui->buffer_graph_peer->resize(this->size().width(), this->size().height() - 140);
+
     Buffer_Chart_View->setParent(ui->buffer_graph_peer);
     Buffer_Chart_View->resize(ui->buffer_graph_peer->size());
 
-    Buffer_Chart_View->setRubberBand(QChartView::HorizontalRubberBand);
 
 }
 
@@ -233,6 +267,8 @@ void SimulationResultWindow::setupDroppedPackGraph()
     Dropped_Pack_Chart->setPlotAreaBackgroundBrush(QBrush(QColor(46, 52, 54)));
 
     Dropped_Pack_Chart_View->setRenderHint(QPainter::Antialiasing);
+    ui->dropped_package_graph->resize(this->size().width(), this->size().height() - 140);
+
     Dropped_Pack_Chart_View->setParent(ui->dropped_package_graph);
     Dropped_Pack_Chart_View->resize(ui->dropped_package_graph->size());
 
@@ -263,6 +299,8 @@ void SimulationResultWindow::setupReservationGraph()
     Reservation_Chart->setPlotAreaBackgroundBrush(QBrush(QColor(46, 52, 54)));
 
     Reservation_Chart_View->setRenderHint(QPainter::Antialiasing);
+    ui->reservation_graph->resize(this->size().width(), this->size().height() - 140);
+
     Reservation_Chart_View->setParent(ui->reservation_graph);
     Reservation_Chart_View->resize(ui->reservation_graph->size());
 
@@ -409,12 +447,12 @@ void SimulationResultWindow::addReservationValue(double Value)
 
 
 
-void SimulationResultWindow::saveGraphtoFile(const QString &UpperDir, const QString &Title)
+void SimulationResultWindow::saveGraphtoFile(const QString &HomeDir, const QString &UpperDir, const QString &Title)
 {
 
     QString dir;
 
-    dir = "graphs";
+    dir = HomeDir + "/graphs";
 
     if(!QDir(dir).exists())
         QDir().mkdir(dir);
@@ -483,6 +521,99 @@ void SimulationResultWindow::saveGraphtoFile(const QString &UpperDir, const QStr
     Sample_Count = 0;
 
 }
+
+void SimulationResultWindow::closeButton1Clicked()
+{
+    this->close();
+
+}
+
+void SimulationResultWindow::nextButton1Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() + 1);
+
+}
+
+void SimulationResultWindow::previousButton1Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() - 1);
+}
+
+void SimulationResultWindow::closeButton2Clicked()
+{
+    this->close();
+}
+
+void SimulationResultWindow::nextButton2Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() + 1);
+}
+
+void SimulationResultWindow::previousButton2Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() - 1);
+}
+
+void SimulationResultWindow::closeButton3Clicked()
+{
+    this->close();
+}
+
+void SimulationResultWindow::nextButton3Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() + 1);
+}
+
+void SimulationResultWindow::previousButton3Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() - 1);
+}
+
+void SimulationResultWindow::closeButton4Clicked()
+{
+    this->close();
+}
+
+void SimulationResultWindow::nextButton4Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() + 1);
+}
+
+void SimulationResultWindow::previousButton4Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() - 1);
+}
+
+void SimulationResultWindow::closeButton5Clicked()
+{
+    this->close();
+}
+
+void SimulationResultWindow::nextButton5Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() + 1);
+}
+
+void SimulationResultWindow::previousButton5Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() - 1);
+}
+
+void SimulationResultWindow::closeButton6Clicked()
+{
+    this->close();
+}
+
+void SimulationResultWindow::nextButton6Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() + 1);
+}
+
+void SimulationResultWindow::previousButton6Clicked()
+{
+    ui->stackedWidget->setCurrentIndex(ui->stackedWidget->currentIndex() - 1);
+}
+
 
 
 

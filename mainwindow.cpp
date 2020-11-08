@@ -1,6 +1,8 @@
 #include "mainwindow.h"
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QDebug>
+#include <QStandardPaths>
 #include "logging.h"
 #include "ui_mainwindow.h"
 
@@ -44,6 +46,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(MainWindow_Ui->clear_list_button, SIGNAL(clicked()), this, SLOT(clearListButtonClicked()));
     connect(MainWindow_Ui->clear_array_button, SIGNAL(clicked()), this, SLOT(clearArrayButtonClicked()));
     connect(MainWindow_Ui->open_graph_button, SIGNAL(clicked()), this, SLOT(openGraphButtonClicked()));
+
+    connect(MainWindow_Ui->simulation_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)), this, SLOT(simulationDoubleClicked(QListWidgetItem*)));
 
     connect(MainWindow_Ui->simulation_array_list, SIGNAL(itemDoubleClicked(QListWidgetItem*)),
             this, SLOT(simulationArrayListDoubleClicked(QListWidgetItem*)));
@@ -316,7 +320,7 @@ void MainWindow::openGraphButtonClicked()
 {
     int line_counter = 0;
     QString line_name;
-    QString file_name = QFileDialog::getOpenFileName(this);
+    QString file_name = QFileDialog::getOpenFileName(this, QStandardPaths::writableLocation(QStandardPaths::DataLocation));
     PeerSimulationOutput output;
 
     Simulation_Result_Window = new SimulationResultWindow("result");
@@ -338,27 +342,27 @@ void MainWindow::openGraphButtonClicked()
             {
                 switch (i)
                 {
-                case 0:
-                    line_name = data_str.at(i);
-                    break;
-                case 1:
-                    output.Max_Total_Collusion_Value = data_str.at(i).toDouble();
-                    break;
-                case 2:
-                    output.Max_Buffer_Value = data_str.at(i).toDouble();
-                    break;
-                case 3:
-                    output.Max_DataRate_Value = data_str.at(i).toDouble();
-                    break;
-                case 4:
-                    output.Max_Delay = data_str.at(i).toDouble();
-                    break;
-                case 5:
-                    output.Max_Dropped_Package_Value = data_str.at(i).toDouble();
-                    break;
-                case 6:
-                    output.Max_Unsuccesfull_Reservation = data_str.at(i).toDouble();
-                    break;
+                    case 0:
+                        line_name = data_str.at(i);
+                        break;
+                    case 1:
+                        output.Max_Total_Collusion_Value = data_str.at(i).toDouble();
+                        break;
+                    case 2:
+                        output.Max_Buffer_Value = data_str.at(i).toDouble();
+                        break;
+                    case 3:
+                        output.Max_DataRate_Value = data_str.at(i).toDouble();
+                        break;
+                    case 4:
+                        output.Max_Delay = data_str.at(i).toDouble();
+                        break;
+                    case 5:
+                        output.Max_Dropped_Package_Value = data_str.at(i).toDouble();
+                        break;
+                    case 6:
+                        output.Max_Unsuccesfull_Reservation = data_str.at(i).toDouble();
+                        break;
                 }
             }
           }
@@ -371,6 +375,14 @@ void MainWindow::openGraphButtonClicked()
 
     }
 
+
+}
+
+
+
+void MainWindow::simulationDoubleClicked(QListWidgetItem *item)
+{
+    Menu_.exec(QCursor::pos());
 
 }
 
@@ -397,7 +409,7 @@ void MainWindow::processEndOf()
 {
     Logging::printAll(Logging::white, " All Simulations are done" );
 
-    Total_Result_Window.saveGraphtoFile("graphs", MainWindow_Ui->simulation_name->text());
+    Total_Result_Window.saveGraphtoFile(Log_Directory , "graphs", MainWindow_Ui->simulation_name->text());
     Total_Result_Window.show();
 
     MainWindow_Ui->start_button->setChecked(false);
@@ -425,7 +437,7 @@ void MainWindow::processCurrentSimulationListOutput()
 
 
     Simulation_Result_Windows[Current_Simulation_Array]->
-            saveGraphtoFile(MainWindow_Ui->simulation_name->text(),
+            saveGraphtoFile(Log_Directory, MainWindow_Ui->simulation_name->text(),
                             Simulation_List_Array_Name[Current_Simulation_Array]);
 
     Current_Simulation = 0;
@@ -462,7 +474,7 @@ void MainWindow::processCurrentSimulationOutput(Simulation *Sim)
     Simulation_Result_Windows[Current_Simulation_Array]->refreshValues(output,
             Sim->Input_Info.Simulation_Name);
 
-    Sim->saveSimulation(MainWindow_Ui->simulation_name->text(),
+    Sim->saveSimulation(Log_Directory, MainWindow_Ui->simulation_name->text(),
                            Simulation_List_Array_Name[Current_Simulation_Array]);
 
 
@@ -658,8 +670,12 @@ void MainWindow::startButtonToggled(bool checked)
 {
 
 
+    qDebug() << QStandardPaths::writableLocation(QStandardPaths::DataLocation);
+
     if(checked == true)
     {
+        Log_Directory = QFileDialog::getExistingDirectory(this, QStandardPaths::writableLocation(QStandardPaths::DataLocation));
+
         if(!Simulation_List_Array.empty())
         {
 

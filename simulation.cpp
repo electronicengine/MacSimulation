@@ -75,17 +75,17 @@ void Simulation::resetSimulation()
 
 
 
-void Simulation::saveSimulation(const QString &UpperDir, const QString &MainDir)
+void Simulation::saveSimulation(const QString &HomeDir, const QString &UpperDir, const QString &MainDir)
 {
     QString dir ;
 
     Logging::printAll(Logging::white, "saveSimulation - ", Input_Info.Simulation_Name.toStdString());
 
 
-    if(!QDir("graphs").exists())
-        QDir().mkdir("graphs");
+    if(!QDir(HomeDir + "/graphs").exists())
+        QDir().mkdir(HomeDir + "/graphs");
 
-    dir = "graphs/" + UpperDir;
+    dir = HomeDir + "/graphs/" + UpperDir;
 
     if(!QDir(dir).exists())
         QDir().mkdir(dir);

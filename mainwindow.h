@@ -60,7 +60,7 @@ private slots:
     void clearArrayButtonClicked();
     void progressBarUpdate();
     void openGraphButtonClicked();
-
+    void simulationDoubleClicked(QListWidgetItem *item);
     void simulationArrayListDoubleClicked(QListWidgetItem *item);
 signals:
 
@@ -72,7 +72,7 @@ private:
     SimulationResultWindow Total_Result_Window;
     SimulationAdder Simulation_Adder;
     SimulationResultWindow *Simulation_Result_Window;
-
+    QString Log_Directory;
     QMenu Menu_;
 
     QAction *Auto_Add_Cap;
