@@ -116,6 +116,7 @@ void MainWindow::simulationEditCallBack(int Index, InputInfo &Input)
 
 void MainWindow::importListToArray()
 {
+
     Simulation_Result_Windows.push_back(new SimulationResultWindow(
                                             MainWindow_Ui->simulation_array_list_name->text()));
 
@@ -151,7 +152,6 @@ void MainWindow::addSimulation(InputInfo &Input)
 
     Simulation_List.push_back(std::make_shared<Simulation>(Input));
     Simulation_List[Simulation_List.size() - 1]->setInputs(Input);
-
 
 }
 
@@ -231,7 +231,6 @@ void MainWindow::autoAddIncreasingCapTriggered(bool)
 void MainWindow::autoAddIncreasingCfpTriggered(bool)
 {
 
-
     if(Simulation_List.size() <= 0)
     {
         showMessageBox("Warning!", "You should add at least one simulation");
@@ -245,7 +244,6 @@ void MainWindow::autoAddIncreasingCfpTriggered(bool)
     Simulation_List_Array.clear();
     MainWindow_Ui->simulation_list->clear();
     MainWindow_Ui->simulation_array_list->clear();
-
 
     Simulation_Adder.autoAddSimulationIncreasingCfp(input);
 
@@ -334,9 +332,10 @@ void MainWindow::openGraphButtonClicked()
 
           QString line = in.readLine();
 
-          if(line_counter != 0)
+          if(line_counter > 1)
           {
             QStringList data_str = line.split("\t\t ");
+
 
             for(int i=0; i<data_str.size(); i++)
             {
@@ -365,9 +364,12 @@ void MainWindow::openGraphButtonClicked()
                         break;
                 }
             }
+
+            Simulation_Result_Window->refreshValues(output, line_name);
+
+
           }
 
-          Simulation_Result_Window->refreshValues(output, line_name);
           line_counter++;
        }
        inputFile.close();
@@ -382,6 +384,7 @@ void MainWindow::openGraphButtonClicked()
 
 void MainWindow::simulationDoubleClicked(QListWidgetItem *item)
 {
+    (void)item;
     Menu_.exec(QCursor::pos());
 
 }

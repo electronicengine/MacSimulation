@@ -32,15 +32,16 @@ void SimulationAdder::autoAddSimulationIncreasingCap(const InputInfo &Input)
 
                 double cap_period_time = input.cap_slot_num * input.Cap_Slot_Lenght;
 
-                double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Lenght * input.Peer_List.size();
+                double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Per * input.Peer_List.size();
 
                 double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / input.Peer_List[i].Transmission_Delay;
 
-                double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Lenght) *
+                double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Per) *
                                               (PACKAGE_SIZE * 8))/(beacon_period_time + cap_period_time + cfp_period_time);
 
-                double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
-                        total_package_per_cfp_slot;
+                double assumed_buffer = std::ceil(((beacon_period_time + cap_period_time + cfp_period_time) * estimated_data_rate) /
+                        ((double)(PACKAGE_SIZE * 8)));
+
 
 
                 input.Peer_List[i].Transmission_Delay = input.Peer_List[i].Transmission_Delay;
@@ -91,15 +92,15 @@ void SimulationAdder::autoAddSimulationIncreasingCfp(const InputInfo &Input)
 
                 double cap_period_time = input.cap_slot_num * input.Cap_Slot_Lenght;
 
-                double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Lenght * input.Peer_List.size();
+                double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Per * input.Peer_List.size();
 
                 double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / input.Peer_List[i].Transmission_Delay;
 
-                double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Lenght) *
+                double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Per) *
                                               (PACKAGE_SIZE * 8))/(beacon_period_time + cap_period_time + cfp_period_time);
 
-                double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
-                        total_package_per_cfp_slot;
+                double assumed_buffer = std::ceil(((beacon_period_time + cap_period_time + cfp_period_time) * estimated_data_rate) /
+                        ((double)(PACKAGE_SIZE * 8)));
 
 
                 input.Peer_List[i].Transmission_Delay = input.Peer_List[i].Transmission_Delay;
@@ -148,17 +149,17 @@ void SimulationAdder::autoAddSimulationIncreasingUser(const InputInfo &Input)
 
             double cap_period_time = input.cap_slot_num * input.Cap_Slot_Lenght;
 
-            double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Lenght * input.Peer_List.size();
+            double cfp_period_time = input.Cfp_Slot_Lenght * input.Cfp_Slot_Per * input.Peer_List.size();
 
             int transmission_delay = (double)(rand() % 300) / 100;
 
             double total_package_per_cfp_slot = (double) input.Cfp_Slot_Lenght / transmission_delay;
 
-            double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Lenght) *
+            double estimated_data_rate = (std::floor(total_package_per_cfp_slot * input.Cfp_Slot_Per) *
                                           (PACKAGE_SIZE * 8))/(beacon_period_time + cap_period_time + cfp_period_time);
 
-            double assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) /
-                    total_package_per_cfp_slot;
+            double assumed_buffer = std::ceil(((beacon_period_time + cap_period_time + cfp_period_time) * estimated_data_rate) /
+                    ((double)(PACKAGE_SIZE * 8)));
 
 
             int rety_count = 5;

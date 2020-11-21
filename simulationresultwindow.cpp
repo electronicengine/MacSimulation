@@ -507,14 +507,14 @@ void SimulationResultWindow::saveGraphtoFile(const QString &HomeDir, const QStri
     for(int i = 0; i<Sample_Count; i++)
     {
         out << Sample_Names[i]
-            << "\t\t " << QString::number(Collusion_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Buffer_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(DataRate_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Delay_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Avarage_Delay_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Dropped_Pack_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Total_Package_Sent_Series->at(i).y()).leftJustified(8,'0')
-            << "\t\t " << QString::number(Reservation_Series->at(i).y()).leftJustified(8,'0')
+            << "\t\t " << QString::number(Collusion_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Buffer_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(DataRate_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Delay_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Avarage_Delay_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Dropped_Pack_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Total_Package_Sent_Series->at(i).y()).rightJustified(8,'0')
+            << "\t\t " << QString::number(Reservation_Series->at(i).y()).rightJustified(8,'0')
             <<" \n";
     }
 

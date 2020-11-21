@@ -73,7 +73,8 @@ void UserAdd::transmissionDelayChanged(double Delay)
     double estimated_data_rate = (std::floor(total_package_per_cfp_slot * Simulation_Add_Window->ui->cfp_lot_box->value()) *
             (PACKAGE_SIZE * 8))/(beacon_period_time + cap_period_time + cfp_period_time);
 
-    int assumed_buffer = (beacon_period_time + cap_period_time + cfp_period_time) * total_package_per_cfp_slot;
+    int assumed_buffer = std::ceil(((beacon_period_time + cap_period_time + cfp_period_time) * estimated_data_rate) /
+            ((double)(PACKAGE_SIZE * 8)));
 
     ui->desired_datarate->setValue(estimated_data_rate);
     ui->buffer_box->setValue(assumed_buffer);
